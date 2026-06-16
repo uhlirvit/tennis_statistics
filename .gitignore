@@ -1,0 +1,28 @@
+GITIGNORE
+# Generated output -- regenerate anytime by running main.py
+output/*.xlsx
+output/*.csv
+
+# Not created yet, but coming soon per the roadmap -- exclude now so
+# nothing ever lands in git history by accident.
+*.db
+*.sqlite3
+.env
+secrets.py
+*.local.py
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Useful once this runs on a schedule
+*.log
+
+# OS / editor cruft
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
