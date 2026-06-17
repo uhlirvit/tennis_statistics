@@ -112,6 +112,46 @@ def order_by_roster(summary: list[dict], roster: list[dict]) -> list[dict]:
     return sorted(summary, key=sort_key)
 
 
+# label, summary field, display kind -- mirrors the "Oceneni" block in the
+# existing Excel exactly (same six categories, same ranking metric each).
+AWARD_CATEGORIES = [
+    ("MVP", "body_vazeno", "number"),
+    ("Singlový specialista", "uspesnost_singl", "percent"),
+    ("Deblový specialista", "uspesnost_debl", "percent"),
+    ("Nejvíce odehráno", "odehrano_celkem", "integer"),
+    ("Singl výhry", "vyhrano_singl", "integer"),
+    ("Debl výhry", "vyhrano_debl", "integer"),
+]
+
+
+def compute_oceneni(summary: list[dict]) -> dict:
+    """
+    Replicates the 'Oceneni' awards table from the existing Excel: for
+    each category, every player ranked by that category's metric,
+    descending. Excel's SORTBY/SORT(...,-1) -- which is what the
+    original sheet uses -- are stable sorts, so ties keep their
+    original (roster) order; Python's sorted(reverse=True) has the same
+    guarantee, which is why `summary` should already be roster-ordered
+    (via order_by_roster) before this is called.
+
+    A None success-rate (nobody played that discipline yet) is treated
+    as 0 here, matching what the original Oceneni table displays --
+    even though the Player Summary tab shows it blank instead.
+    """
+    result = {}
+    for label, field, _kind in AWARD_CATEGORIES:
+        ranked = sorted(
+            summary,
+            key=lambda s: s[field] if s[field] is not None else 0,
+            reverse=True,
+        )
+        result[label] = [
+            {"name": s["player_name"], "value": s[field] if s[field] is not None else 0}
+            for s in ranked
+        ]
+    return result
+
+
 def build_wide_grid(rounds: list[dict], long_log: list[dict]) -> dict:
     """
     Wide grid for visual side-by-side comparison with the Excel sheet:

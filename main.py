@@ -32,7 +32,10 @@ from openpyxl.utils import get_column_letter
 
 from fetch import fetch
 from parser import parse_roster, parse_rounds, parse_match_record
-from aggregate import build_long_log, compute_player_summary, order_by_roster, build_wide_grid
+from aggregate import (
+    build_long_log, compute_player_summary, order_by_roster,
+    compute_oceneni, AWARD_CATEGORIES, build_wide_grid,
+)
 
 # ---------------------------------------------------------------- CONFIG
 BASE_URL = "https://cesky-tenis.cz"
@@ -104,7 +107,7 @@ def write_workbook(path, roster, rounds, long_log, summary, wide):
     # ---- Sheet 1: Player Summary -----------------------------------
     ws = wb.active
     ws.title = "Player Summary"
-    headers = ["Č.", "Player", "Odehrano singl", "Odehrano debl", "Odehrano celkem",
+    headers = ["Č. na soupisce", "Player", "Odehrano singl", "Odehrano debl", "Odehrano celkem",
                "Vyhrano singl", "Vyhrano debl", "Uspesnost singl", "Uspesnost debl",
                "Body Suma", "Body Vazeno"]
     ws.append(headers)
@@ -121,7 +124,7 @@ def write_workbook(path, roster, rounds, long_log, summary, wide):
         ])
         ws.cell(row=row_idx, column=8).number_format = "0.0%"
         ws.cell(row=row_idx, column=9).number_format = "0.0%"
-    ws.column_dimensions["A"].width = 6
+    ws.column_dimensions["A"].width = 10
     ws.column_dimensions["B"].width = 26
     for col in "CDEFGHIJK":
         ws.column_dimensions[col].width = 13
@@ -173,6 +176,46 @@ def write_workbook(path, roster, rounds, long_log, summary, wide):
         ])
     for i, w in enumerate([6, 12, 32, 9, 7, 26, 26, 8]):
         ws3.column_dimensions[get_column_letter(i + 1)].width = w
+
+    # ---- Sheet 4: Ocenění (awards / rankings) -----------------------
+    ws4 = wb.create_sheet("Ocenění")
+    oceneni = compute_oceneni(summary)
+    categories = list(oceneni.keys())
+    percent_cats = {label for label, _field, kind in AWARD_CATEGORIES if kind == "percent"}
+
+    ws4.cell(row=1, column=1, value="Pořadí")
+    col = 2
+    for cat in categories:
+        ws4.merge_cells(start_row=1, start_column=col, end_row=1, end_column=col + 1)
+        ws4.cell(row=1, column=col, value=cat)
+        col += 2
+    _style_header_row(ws4, 1, col - 1)
+
+    col = 2
+    for cat in categories:
+        ws4.cell(row=2, column=col, value="Jméno")
+        ws4.cell(row=2, column=col + 1, value="Hodnota")
+        col += 2
+    _style_header_row(ws4, 2, col - 1)
+
+    for i in range(len(summary)):
+        row_idx = i + 3
+        ws4.cell(row=row_idx, column=1, value=f"{i + 1}.")
+        col = 2
+        for cat in categories:
+            entry = oceneni[cat][i]
+            ws4.cell(row=row_idx, column=col, value=entry["name"])
+            value_cell = ws4.cell(row=row_idx, column=col + 1, value=entry["value"])
+            if cat in percent_cats:
+                value_cell.number_format = "0.0%"
+            col += 2
+
+    ws4.column_dimensions["A"].width = 8
+    col = 2
+    for _ in categories:
+        ws4.column_dimensions[get_column_letter(col)].width = 16
+        ws4.column_dimensions[get_column_letter(col + 1)].width = 10
+        col += 2
 
     wb.save(path)
 

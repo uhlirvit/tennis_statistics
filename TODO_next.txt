@@ -1,5 +1,8 @@
+DONE:
 1) Ranking of A-team
-2) Formating of the statistics (colours etc.)
+
+TODO:
+2) Formating of the statistics (colours, adding nicknames?, ...)
 3) Testing on season 2026
 4) Improve config to select team and season - automate / user-friendly input (console / input file / ...)
 5) Adding other adult teams (B, C, D?)
