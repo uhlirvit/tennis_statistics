@@ -112,15 +112,17 @@ def order_by_roster(summary: list[dict], roster: list[dict]) -> list[dict]:
     return sorted(summary, key=sort_key)
 
 
-# label, summary field, display kind -- mirrors the "Oceneni" block in the
-# existing Excel exactly (same six categories, same ranking metric each).
+# label, summary field, display kind, conditional-formatting treatment --
+# mirrors the "Oceneni" block in the existing Excel exactly (same six
+# categories, same ranking metric, and the same color/data-bar choice
+# the original file uses for that metric).
 AWARD_CATEGORIES = [
-    ("MVP", "body_vazeno", "number"),
-    ("Singlový specialista", "uspesnost_singl", "percent"),
-    ("Deblový specialista", "uspesnost_debl", "percent"),
-    ("Nejvíce odehráno", "odehrano_celkem", "integer"),
-    ("Singl výhry", "vyhrano_singl", "integer"),
-    ("Debl výhry", "vyhrano_debl", "integer"),
+    ("MVP", "body_vazeno", "number", "databar_blue"),
+    ("Singlový specialista", "uspesnost_singl", "percent", "colorscale"),
+    ("Deblový specialista", "uspesnost_debl", "percent", "colorscale"),
+    ("Nejvíce odehráno", "odehrano_celkem", "integer", None),
+    ("Singl výhry", "vyhrano_singl", "integer", "databar_green"),
+    ("Debl výhry", "vyhrano_debl", "integer", "databar_orange"),
 ]
 
 
@@ -139,7 +141,7 @@ def compute_oceneni(summary: list[dict]) -> dict:
     even though the Player Summary tab shows it blank instead.
     """
     result = {}
-    for label, field, _kind in AWARD_CATEGORIES:
+    for label, field, _kind, _cf in AWARD_CATEGORIES:
         ranked = sorted(
             summary,
             key=lambda s: s[field] if s[field] is not None else 0,

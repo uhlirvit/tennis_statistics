@@ -9,3 +9,18 @@ TODO:
 6) Adding club summary and ranking
 7) Adding club history
 8) Adding different categories (dorost, st. žáci, ml. žáci, baby, ...)
+
+
+
+
+
+
+
+
+
+
+
+
+
+Prompts:
+- Also I am thinking of creating some plots and cool visualizations at the end of it all. Would it make more sense to leave this at the very end?
