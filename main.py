@@ -32,7 +32,7 @@ from openpyxl.utils import get_column_letter
 
 from fetch import fetch
 from parser import parse_roster, parse_rounds, parse_match_record
-from aggregate import build_long_log, compute_player_summary, build_wide_grid
+from aggregate import build_long_log, compute_player_summary, order_by_roster, build_wide_grid
 
 # ---------------------------------------------------------------- CONFIG
 BASE_URL = "https://cesky-tenis.cz"
@@ -75,6 +75,7 @@ def run():
 
     long_log = build_long_log(rounds, match_records)
     summary = compute_player_summary(long_log)
+    summary = order_by_roster(summary, roster)
     wide = build_wide_grid(rounds, long_log)
 
     os.makedirs(OUTPUT_DIR, exist_ok=True)
@@ -103,7 +104,7 @@ def write_workbook(path, roster, rounds, long_log, summary, wide):
     # ---- Sheet 1: Player Summary -----------------------------------
     ws = wb.active
     ws.title = "Player Summary"
-    headers = ["Player", "Odehrano singl", "Odehrano debl", "Odehrano celkem",
+    headers = ["Č.", "Player", "Odehrano singl", "Odehrano debl", "Odehrano celkem",
                "Vyhrano singl", "Vyhrano debl", "Uspesnost singl", "Uspesnost debl",
                "Body Suma", "Body Vazeno"]
     ws.append(headers)
@@ -113,15 +114,16 @@ def write_workbook(path, roster, rounds, long_log, summary, wide):
     for i, s in enumerate(summary):
         row_idx = i + 2
         ws.append([
-            s["player_name"], s["odehrano_singl"], s["odehrano_debl"], s["odehrano_celkem"],
+            s["roster_no"], s["player_name"], s["odehrano_singl"], s["odehrano_debl"], s["odehrano_celkem"],
             s["vyhrano_singl"], s["vyhrano_debl"],
             s["uspesnost_singl"], s["uspesnost_debl"],
             s["body_suma"], s["body_vazeno"],
         ])
-        ws.cell(row=row_idx, column=7).number_format = "0.0%"
         ws.cell(row=row_idx, column=8).number_format = "0.0%"
-    ws.column_dimensions["A"].width = 26
-    for col in "BCDEFGHIJ":
+        ws.cell(row=row_idx, column=9).number_format = "0.0%"
+    ws.column_dimensions["A"].width = 6
+    ws.column_dimensions["B"].width = 26
+    for col in "CDEFGHIJK":
         ws.column_dimensions[col].width = 13
 
     # ---- Sheet 2: Match Grid (visual layout like your Excel) -------

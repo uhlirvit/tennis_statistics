@@ -76,8 +76,40 @@ def compute_player_summary(long_log: list[dict]) -> list[dict]:
             "body_suma": vs_ + vd_,
             "body_vazeno": vs_ * 1.0 + vd_ * 0.5,
         })
-    summary.sort(key=lambda r: r["body_vazeno"], reverse=True)
-    return summary
+    return summary  # order = order of first appearance; call order_by_roster() to reorder
+
+
+def order_by_roster(summary: list[dict], roster: list[dict]) -> list[dict]:
+    """
+    Reorder a player summary to match the official Soupiska (roster) order
+    from the team page, rather than performance. Roster entries are
+    matched by player_id (robust to name-format differences). Any player
+    who appears in the data but not in the supplied roster -- e.g. a
+    substitute who isn't on the season's published Soupiska -- is placed
+    at the end, alphabetically, with a note printed so it's easy to spot.
+    """
+    roster_position = {}
+    for entry in roster:
+        pid = entry.get("player_id")
+        if pid is None:
+            continue
+        try:
+            roster_position[pid] = int(entry["roster_no"])
+        except (TypeError, ValueError):
+            continue
+
+    unmatched = [s["player_name"] for s in summary if s["player_id"] not in roster_position]
+    if unmatched:
+        print(f"  NOTE: {len(unmatched)} player(s) not found on the roster, placed at the end: {', '.join(unmatched)}")
+
+    for s in summary:
+        s["roster_no"] = roster_position.get(s["player_id"])  # None if not on the fetched roster
+
+    def sort_key(s):
+        pos = s["roster_no"]
+        return (1, s["player_name"]) if pos is None else (0, pos)
+
+    return sorted(summary, key=sort_key)
 
 
 def build_wide_grid(rounds: list[dict], long_log: list[dict]) -> dict:
