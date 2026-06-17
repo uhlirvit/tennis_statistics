@@ -1,14 +1,17 @@
 DONE:
 1) Ranking of A-team
+2) Formating of the statistics (colours, data bars, ...)
 
 TODO:
-2) Formating of the statistics (colours, adding nicknames?, ...)
 3) Testing on season 2026
 4) Improve config to select team and season - automate / user-friendly input (console / input file / ...)
 5) Adding other adult teams (B, C, D?)
 6) Adding club summary and ranking
 7) Adding club history
-8) Adding different categories (dorost, st. žáci, ml. žáci, baby, ...)
+8) Adding plots
+9) Adding nicknames in output layer
+10) Adding different categories (dorost, st. žáci, ml. žáci, baby, ...)
+
 
 
 

@@ -155,7 +155,7 @@ def write_workbook(path, roster, rounds, long_log, summary, wide):
     # ---- Sheet 1: Player Summary -----------------------------------
     ws = wb.active
     ws.title = "Player Summary"
-    headers = ["Č. na soupisce", "Hráč / hráčka", "Odehráno singl", "Odehráno debl", "Odehráno celkem",
+    headers = ["Č. na soupisce", "Jméno", "Odehráno singl", "Odehráno debl", "Odehráno celkem",
                "Vyhráno singl", "Vyhráno debl", "Úspěšnost singl", "Úspěšnost debl",
                "Body Suma", "Body Váženo"]
     ws.append(headers)
@@ -187,7 +187,7 @@ def write_workbook(path, roster, rounds, long_log, summary, wide):
     # ---- Sheet 2: Match Grid (visual layout like your Excel) -------
     ws2 = wb.create_sheet("Match Grid")
     headers_info = wide["headers"]
-    ws2.cell(row=1, column=1, value="Hráč / hráčka")
+    ws2.cell(row=1, column=1, value="Jméno")
     col = 2
     for h in headers_info:
         ws2.merge_cells(start_row=1, start_column=col, end_row=1, end_column=col + 1)
@@ -221,7 +221,7 @@ def write_workbook(path, roster, rounds, long_log, summary, wide):
 
     # ---- Sheet 3: Match Log (audit trail) ---------------------------
     ws3 = wb.create_sheet("Match Log")
-    log_headers = ["Kolo", "Datum", "Soupeř", "Pozice", "Typ", "Hráč / hráčka", "Partner / partnerka", "Výsledek"]
+    log_headers = ["Kolo", "Datum", "Soupeř", "Pozice", "Typ", "Jméno", "Partner / partnerka", "Výsledek"]
     ws3.append(log_headers)
     _style_header_row(ws3, 1, len(log_headers))
     for row in long_log:
