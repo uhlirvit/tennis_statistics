@@ -77,7 +77,7 @@ from openpyxl.utils import get_column_letter
 from openpyxl.formatting.rule import DataBarRule, ColorScaleRule
 
 from fetch import fetch
-from parser import parse_roster, parse_rounds, parse_match_record
+from parser import parse_roster, parse_rounds, parse_match_record, parse_club_display_name
 from aggregate import (
     build_long_log, compute_player_summary, order_by_roster,
     compute_oceneni, AWARD_CATEGORIES, build_wide_grid,
@@ -131,8 +131,19 @@ def run_one(entry):
     print(f"  Parsed competition_id={competition_id}, team_number={team_number}")
     print(f"Fetching team page: {team_url(competition_id, team_number)}")
     comp_html = fetch(team_url(competition_id, team_number))
+
+    club_display_name = parse_club_display_name(comp_html)
+    if not club_display_name:
+        print(f"  WARNING: couldn't read a team name off this page at all -- falling back to {CLUB_NAME!r}")
+        club_display_name = CLUB_NAME
+    elif CLUB_NAME not in club_display_name:
+        print(f"  WARNING: page's team name is {club_display_name!r}, which doesn't contain "
+              f"{CLUB_NAME!r} -- double check the URL/team_number for this row, this might be the wrong team.")
+    elif club_display_name != CLUB_NAME:
+        print(f"  Note: this team's exact name on the site is {club_display_name!r}, using that.")
+
     roster = parse_roster(comp_html)
-    rounds = parse_rounds(comp_html, CLUB_NAME)
+    rounds = parse_rounds(comp_html, club_display_name)
     print(f"  Found {len(roster)} roster entries, {len(rounds)} rounds.")
 
     match_records = {}
@@ -145,11 +156,18 @@ def run_one(entry):
         print(f"  Fetching round {rnd['kolo']} ({rnd['date']} vs {rnd['opponent']}): {url}")
         try:
             match_html = fetch(url)
-            match_records[zid] = parse_match_record(match_html, CLUB_NAME)
+            match_records[zid] = parse_match_record(match_html, club_display_name)
         except RuntimeError as e:
             print(f"    WARNING: {e}")
 
     long_log = build_long_log(rounds, match_records)
+    if match_records and not long_log:
+        raise RuntimeError(
+            f"Fetched {len(match_records)} match record(s) but extracted 0 player "
+            f"results for any of them. Most likely cause: the team's name on the "
+            f"site doesn't match CLUB_NAME ({CLUB_NAME!r}) -- check whether this "
+            f"division shows it with a suffix, e.g. 'TK Sport Kolovraty C'."
+        )
     summary = compute_player_summary(long_log)
     summary = order_by_roster(summary, roster)
     wide = build_wide_grid(rounds, long_log)

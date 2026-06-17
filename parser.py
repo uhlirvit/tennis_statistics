@@ -21,6 +21,22 @@ def extract_player_id(href: str) -> str | None:
     return m.group(1) if m else None
 
 
+def parse_club_display_name(html: str) -> str | None:
+    """
+    The exact name this specific team uses on its own page, read from
+    the page's <h1>. This matters because the site doesn't always use
+    one consistent name per club: the top team may appear as plain
+    "TK Sport Kolovraty" while a lower team appears as "TK Sport
+    Kolovraty C". Using a single hardcoded club name to decide "is this
+    side us" breaks for any team whose page uses a suffixed name --
+    silently, since it just stops matching rather than erroring. Reading
+    the name straight off each page sidesteps the whole problem.
+    """
+    soup = BeautifulSoup(html, "html.parser")
+    h1 = soup.find("h1")
+    return h1.get_text(strip=True) if h1 else None
+
+
 def parse_roster(html: str) -> list[dict]:
     """Parse the 'Soupiska' (roster) table on a competition/team page."""
     soup = BeautifulSoup(html, "html.parser")
@@ -80,9 +96,13 @@ def parse_rounds(html: str, club_name: str) -> list[dict]:
                 m = re.search(r"zapas=(\d+)", zapis_href)
                 zapas_id = m.group(1) if m else None
 
-            if home_team == club_name:
+            # startswith, not ==: divisions with multiple same-club teams
+            # (e.g. lower categories where Kolovraty B and C both play)
+            # disambiguate by suffixing the letter, e.g. "TK Sport
+            # Kolovraty C" -- an exact match would silently never fire.
+            if home_team and home_team.startswith(club_name):
                 our_side = "D"
-            elif away_team == club_name:
+            elif away_team and away_team.startswith(club_name):
                 our_side = "H"
             else:
                 our_side = None  # shouldn't happen on our team's page
@@ -145,9 +165,9 @@ def parse_match_record(html: str, club_name: str) -> dict:
         elif label == "Místo konání":
             venue = p.get_text(strip=True).replace("Místo konání", "").strip()
 
-    if home_team == club_name:
+    if home_team and home_team.startswith(club_name):
         our_side = "D"
-    elif away_team == club_name:
+    elif away_team and away_team.startswith(club_name):
         our_side = "H"
     else:
         our_side = None
