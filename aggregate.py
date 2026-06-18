@@ -40,24 +40,32 @@ def build_long_log(rounds: list[dict], match_records: dict[str, dict]) -> list[d
 
 
 def compute_player_summary(long_log: list[dict]) -> list[dict]:
-    """One row per player with the same stat columns as the existing Excel."""
+    """
+    One row per player with the same stat columns as the existing Excel.
+    Keyed by player_id (falling back to name if id is somehow missing),
+    not by name -- this matters once results from multiple teams get
+    merged together (the all-club view), where keying by name risks
+    silently splitting one person into two rows if they were ever
+    entered under slightly different name text in different places.
+    Keying by the site's own numeric ID sidesteps that entirely.
+    """
     players = {}
     for row in long_log:
-        name = row["player_name"]
-        if name not in players:
-            players[name] = {
-                "player_name": name,
+        key = row["player_id"] or row["player_name"]
+        if key not in players:
+            players[key] = {
+                "player_name": row["player_name"],
                 "player_id": row["player_id"],
                 "odehrano_singl": 0, "odehrano_debl": 0,
                 "vyhrano_singl": 0, "vyhrano_debl": 0,
             }
-        p = players[name]
+        p = players[key]
         if row["result"] is None:
             continue
-        key = "singl" if row["type"] == "singl" else "debl"
-        p[f"odehrano_{key}"] += 1
+        stat_key = "singl" if row["type"] == "singl" else "debl"
+        p[f"odehrano_{stat_key}"] += 1
         if row["result"] == "W":
-            p[f"vyhrano_{key}"] += 1
+            p[f"vyhrano_{stat_key}"] += 1
 
     summary = []
     for p in players.values():
@@ -169,3 +177,51 @@ def build_wide_grid(rounds: list[dict], long_log: list[dict]) -> dict:
 
     headers = [{"kolo": r["kolo"], "date": r["date"], "opponent": r["opponent"]} for r in rounds]
     return {"grid": grid, "headers": headers}
+
+
+def merge_long_logs(team_bundles: list[tuple[str, dict]]) -> tuple[list[dict], dict[str, list[str]]]:
+    """
+    Combines every team's long_log into one, for the all-club view of a
+    season (players who played for more than one team get their results
+    from every team they appeared on summed together once this feeds
+    into compute_player_summary).
+
+    team_bundles: list of (team_label, data) where data["long_log"] is
+    what process_one_team produced for that team.
+
+    Returns (combined_long_log, teams_by_player_id) where teams_by_player_id
+    maps player_id -> sorted list of team_labels that player appeared on
+    -- used to show e.g. "A, C" next to a player who played both.
+    """
+    combined = []
+    teams_by_player_id: dict[str, set] = {}
+    for team_label, data in team_bundles:
+        for row in data["long_log"]:
+            tagged = dict(row)
+            tagged["team"] = team_label
+            combined.append(tagged)
+            pid = row["player_id"]
+            if pid is not None:
+                teams_by_player_id.setdefault(pid, set()).add(team_label)
+    return combined, {pid: sorted(teams) for pid, teams in teams_by_player_id.items()}
+
+
+def compute_all_club_summary(team_bundles: list[tuple[str, dict]]) -> list[dict]:
+    """
+    The cross-team view: every player who appeared for any team in this
+    season+category, with their results from every team they played for
+    summed together. Built by merging long_logs (see merge_long_logs)
+    and running the result through the same compute_player_summary used
+    for a single team -- one aggregation code path, not two, so there's
+    no separate "combine the summaries" logic that could drift out of
+    sync with how a single team's stats are computed.
+
+    Ordered by Body Vazeno descending, since there's no single roster
+    that spans multiple teams to order by instead.
+    """
+    combined_long_log, teams_by_player_id = merge_long_logs(team_bundles)
+    summary = compute_player_summary(combined_long_log)
+    for s in summary:
+        s["teams"] = "/".join(teams_by_player_id.get(s["player_id"], []))
+    summary.sort(key=lambda s: s["body_vazeno"], reverse=True)
+    return summary

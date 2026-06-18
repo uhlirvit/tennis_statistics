@@ -81,7 +81,7 @@ from fetch import fetch
 from parser import parse_roster, parse_rounds, parse_match_record, parse_club_display_name
 from aggregate import (
     build_long_log, compute_player_summary, order_by_roster,
-    compute_oceneni, AWARD_CATEGORIES, build_wide_grid,
+    compute_oceneni, AWARD_CATEGORIES, build_wide_grid, compute_all_club_summary,
 )
 
 # ---------------------------------------------------------------- CONFIG
@@ -390,7 +390,15 @@ def add_team_sheets(wb, team_label, roster, rounds, long_log, summary, wide):
         ws3.column_dimensions[get_column_letter(i + 1)].width = w
 
     # ---- Awards / rankings (matches the "Oceneni" block) -------------
-    ws4 = wb.create_sheet(_sheet_name(team_label, "Awards"))
+    _add_awards_sheet(wb, _sheet_name(team_label, "Awards"), summary)
+
+
+def _add_awards_sheet(wb, sheet_name, summary):
+    """Builds one Awards/ranking sheet from a player summary list.
+    Shared by add_team_sheets (per-team) and add_all_club_sheets
+    (cross-team) since the ranking logic is identical either way --
+    only which summary list feeds it differs."""
+    ws4 = wb.create_sheet(sheet_name)
     oceneni = compute_oceneni(summary)
     categories = list(oceneni.keys())
     percent_cats = {label for label, _field, kind, _cf in AWARD_CATEGORIES if kind == "percent"}
@@ -439,11 +447,61 @@ def add_team_sheets(wb, team_label, roster, rounds, long_log, summary, wide):
         _add_cf(ws4, cf_kind, col_letter, 3, last_row_oc)
 
 
+def add_all_club_sheets(wb, team_bundles):
+    """
+    Builds the merged 'All Club' view across every team in this
+    season+category group -- mirroring the 'Klub dospělí' block at the
+    bottom of the original Excel. A player who appeared on more than
+    one team gets their raw counts summed across every team they
+    played for (not averaged, not double-counted), with a 'Týmy'
+    column showing which teams contributed.
+
+    This intentionally re-keys by player_id rather than trusting name
+    text to line up across teams -- which is exactly the thing that
+    silently went wrong in the original spreadsheet (Volf Jakub was
+    entered as "Kuba" on one team's block and "Kuba Volf" on another,
+    and the combined table's formula ended up summing the wrong two
+    rows together as a result). Computing this fresh avoids that.
+    """
+    combined_summary = compute_all_club_summary(team_bundles)
+
+    ws = wb.create_sheet("All Club - Player Summary")
+    headers = ["Jméno", "Týmy", "Odehráno singl", "Odehráno debl", "Odehráno celkem",
+               "Vyhráno singl", "Vyhráno debl", "Úspěšnost singl", "Úspěšnost debl",
+               "Body Suma", "Body Váženo"]
+    ws.append(headers)
+    _style_header_row(ws, 1, len(headers))
+
+    for i, s in enumerate(combined_summary):
+        row_idx = i + 2
+        ws.append([
+            s["player_name"], s["teams"], s["odehrano_singl"], s["odehrano_debl"], s["odehrano_celkem"],
+            s["vyhrano_singl"], s["vyhrano_debl"],
+            s["uspesnost_singl"], s["uspesnost_debl"],
+            s["body_suma"], s["body_vazeno"],
+        ])
+        ws.cell(row=row_idx, column=8).number_format = "0.0%"
+        ws.cell(row=row_idx, column=9).number_format = "0.0%"
+    ws.column_dimensions["A"].width = 26
+    ws.column_dimensions["B"].width = 12
+    for col in "CDEFGHIJK":
+        ws.column_dimensions[col].width = 13
+
+    last_row = 1 + len(combined_summary)
+    _add_databar(ws, "F", 2, last_row, DATABAR_GREEN)
+    _add_databar(ws, "G", 2, last_row, DATABAR_ORANGE)
+    _add_colorscale_ryg(ws, "H", 2, last_row)
+    _add_colorscale_ryg(ws, "I", 2, last_row)
+    _add_databar(ws, "K", 2, last_row, DATABAR_BLUE)
+
+    _add_awards_sheet(wb, "All Club - Awards", combined_summary)
+
+
 def write_season_workbook(path, team_bundles):
     """team_bundles: list of (team_label, data_dict) pairs, where
     data_dict has roster/rounds/long_log/summary/wide as returned by
     process_one_team. Creates a fresh workbook, adds every team's
-    sheet-group, and saves."""
+    sheet-group, then the merged all-club view, and saves."""
     wb = Workbook()
     wb.remove(wb.active)
     for team_label, data in team_bundles:
@@ -451,6 +509,8 @@ def write_season_workbook(path, team_bundles):
             wb, team_label,
             data["roster"], data["rounds"], data["long_log"], data["summary"], data["wide"],
         )
+    if len(team_bundles) >= 2:
+        add_all_club_sheets(wb, team_bundles)
     wb.save(path)
 
 

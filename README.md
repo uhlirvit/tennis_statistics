@@ -104,19 +104,23 @@ your sheet, with both numbers.
 
 ## Next steps
 
-Season and team coverage is now validated: 2025 A, 2024 A, and 2025 C
-all run cleanly, including a real bug found and fixed along the way
-(lower teams using a suffixed display name).
+Season and team coverage is validated (2025 A, 2024 A, 2025 C all run
+cleanly), and the all-club merge is now built: any season+category
+group with 2+ teams gets an extra "All Club - Player Summary" and
+"All Club - Awards" sheet pair, summing a player's results across
+every team they played for that season. This is matched by player ID,
+not name text — which matters, because the original Excel's combined
+section turned out to have exactly the kind of error that approach is
+prone to (one player's contribution from a second team got summed
+into a different player's row, traced back to an off-by-one cell
+reference). Worth knowing about specifically if numbers in the new
+All Club sheets don't match the old manual one for players who
+appeared on multiple teams — the new version is the one to trust.
 
 1. Add B tým, and any other remaining teams/categories, as further
    `teams.csv` rows.
-2. Add the all-club sheet (the bottom block of your original sheet
-   that merges players who played for more than one team in a season)
-   — this slots in as an additional sheet-group in the same per-season
-   workbook, since all teams' data for a season is already gathered
-   together by the time the file gets written.
-3. Only after that: the multi-season history table, which will need
-   its own mechanism since it spans beyond any single season's file —
-   a separate design conversation when we get there.
-4. Further out: scheduling, and the "interesting facts" detection
+2. The multi-season history table is next, and will need its own
+   mechanism since it spans beyond any single season's file — a
+   separate design conversation when we get there.
+3. Further out: scheduling, and the "interesting facts" detection
    mentioned early on.

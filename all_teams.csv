@@ -1,5 +1,5 @@
-url,season_year,team_label,competition_name,,
-https://cesky-tenis.cz/soutez/9029?druzstvoCislo=8,2025,A,Pražská,divize,
-https://cesky-tenis.cz/soutez/8725?druzstvoCislo=1,2024,A,Pražská,divize,
-https://cesky-tenis.cz/soutez/9542?druzstvoCislo=6,2026,A,Pražská,divize,
-https://cesky-tenis.cz/soutez/9043?druzstvoCislo=8,2025,C,3,třída,C
+url,season_year,category,team_label,competition_name
+https://cesky-tenis.cz/soutez/9029?druzstvoCislo=8,2025,dospeli,A,Pražská divize
+https://cesky-tenis.cz/soutez/8725?druzstvoCislo=1,2024,dospeli,A,Pražská
+https://cesky-tenis.cz/soutez/9542?druzstvoCislo=6,2026,dospeli,A,Pražská
+https://cesky-tenis.cz/soutez/9043?druzstvoCislo=8,2025,dospeli,C,3. třída C
