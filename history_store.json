@@ -1,0 +1,952 @@
+{
+  "_meta": {
+    "note": "Persistent history accumulator for TK Sport Kolovraty dospeli. Legacy = aggregate - scraped seasons, computed from history tab formula outputs. Going forward, main.py appends new seasons here automatically.",
+  },
+  "players": {
+    "Marian": {
+      "player_id": "1020475",
+      "teams_history": "A",
+      "_legacy": {
+        "os": 19,
+        "od": 16,
+        "vs": 10,
+        "vd": 9,
+        "seasons": 4
+      },
+      "seasons": {
+        "2024": {
+          "os": 7,
+          "od": 7,
+          "vs": 1,
+          "vd": 6
+        },
+        "2025": {
+          "os": 7,
+          "od": 7,
+          "vs": 1,
+          "vd": 3
+        }
+      }
+    },
+    "Milan": {
+      "player_id": "1013864",
+      "teams_history": "A",
+      "_legacy": {
+        "os": 30,
+        "od": 31,
+        "vs": 24,
+        "vd": 21,
+        "seasons": 5
+      },
+      "seasons": {
+        "2024": {
+          "os": 5,
+          "od": 4,
+          "vs": 3,
+          "vd": 4
+        },
+        "2025": {
+          "os": 5,
+          "od": 6,
+          "vs": 1,
+          "vd": 4
+        }
+      }
+    },
+    "Víťa": {
+      "player_id": "1007484",
+      "teams_history": "A, C",
+      "_legacy": {
+        "os": 73,
+        "od": 72,
+        "vs": 60,
+        "vd": 58,
+        "seasons": 13
+      },
+      "seasons": {
+        "2024": {
+          "os": 7,
+          "od": 7,
+          "vs": 5,
+          "vd": 4
+        },
+        "2025": {
+          "os": 8,
+          "od": 5,
+          "vs": 7,
+          "vd": 4
+        }
+      }
+    },
+    "Béďa": {
+      "player_id": "1030702",
+      "teams_history": "A, C",
+      "_legacy": {
+        "os": 14,
+        "od": 14,
+        "vs": 8,
+        "vd": 6,
+        "seasons": 3
+      },
+      "seasons": {
+        "2024": {
+          "os": 10,
+          "od": 9,
+          "vs": 7,
+          "vd": 7
+        },
+        "2025": {
+          "os": 9,
+          "od": 7,
+          "vs": 7,
+          "vd": 4
+        }
+      }
+    },
+    "Péťa": {
+      "player_id": "24335",
+      "teams_history": "A, C",
+      "_legacy": {
+        "os": 85,
+        "od": 81,
+        "vs": 76,
+        "vd": 58,
+        "seasons": 16
+      },
+      "seasons": {
+        "2024": {
+          "os": 6,
+          "od": 4,
+          "vs": 6,
+          "vd": 3
+        },
+        "2025": {
+          "os": 5,
+          "od": 6,
+          "vs": 5,
+          "vd": 5
+        }
+      }
+    },
+    "Kuba": {
+      "player_id": null,
+      "teams_history": "A, C",
+      "_legacy": {
+        "os": 15,
+        "od": 20,
+        "vs": 6,
+        "vd": 12,
+        "seasons": 6
+      },
+      "seasons": {
+        "2024": {
+          "os": 6,
+          "od": 8,
+          "vs": 6,
+          "vd": 6
+        },
+        "2025": {
+          "os": 8,
+          "od": 9,
+          "vs": 8,
+          "vd": 7
+        }
+      }
+    },
+    "Marlon": {
+      "player_id": "1053104",
+      "teams_history": "A",
+      "_legacy": {
+        "os": 1,
+        "od": 1,
+        "vs": 1,
+        "vd": 0,
+        "seasons": 1
+      },
+      "seasons": {
+        "2025": {
+          "os": 1,
+          "od": 1,
+          "vs": 0,
+          "vd": 0
+        }
+      }
+    },
+    "Kája": {
+      "player_id": "1020939",
+      "teams_history": "A",
+      "_legacy": {
+        "os": 38,
+        "od": 38,
+        "vs": 37,
+        "vd": 16,
+        "seasons": 8
+      },
+      "seasons": {
+        "2024": {
+          "os": 7,
+          "od": 7,
+          "vs": 6,
+          "vd": 4
+        },
+        "2025": {
+          "os": 7,
+          "od": 7,
+          "vs": 4,
+          "vd": 6
+        }
+      }
+    },
+    "Verča": {
+      "player_id": "1006471",
+      "teams_history": "A",
+      "_legacy": {
+        "os": 7,
+        "od": 6,
+        "vs": 4,
+        "vd": 5,
+        "seasons": 1
+      },
+      "seasons": {
+        "2024": {
+          "os": 7,
+          "od": 6,
+          "vs": 4,
+          "vd": 4
+        },
+        "2025": {
+          "os": 3,
+          "od": 1,
+          "vs": 2,
+          "vd": 1
+        }
+      }
+    },
+    "Jessica": {
+      "player_id": "1045010",
+      "teams_history": "A",
+      "_legacy": {
+        "os": 0,
+        "od": 0,
+        "vs": 0,
+        "vd": 0,
+        "seasons": 0
+      },
+      "seasons": {
+        "2025": {
+          "os": 6,
+          "od": 6,
+          "vs": 2,
+          "vd": 5
+        }
+      }
+    },
+    "Marťa": {
+      "player_id": null,
+      "teams_history": "C",
+      "_legacy": {
+        "os": 12,
+        "od": 18,
+        "vs": 2,
+        "vd": 6,
+        "seasons": 7
+      },
+      "seasons": {
+        "2024": {
+          "os": 0,
+          "od": 0,
+          "vs": 0,
+          "vd": 0
+        },
+        "2025": {
+          "os": 2,
+          "od": 2,
+          "vs": 0,
+          "vd": 0
+        }
+      }
+    },
+    "Valča": {
+      "player_id": "1050153",
+      "teams_history": "C",
+      "_legacy": {
+        "os": 0,
+        "od": 0,
+        "vs": 0,
+        "vd": 0,
+        "seasons": 0
+      },
+      "seasons": {
+        "2024": {
+          "os": 5,
+          "od": 5,
+          "vs": 3,
+          "vd": 1
+        },
+        "2025": {
+          "os": 2,
+          "od": 3,
+          "vs": 1,
+          "vd": 1
+        }
+      }
+    },
+    "Maks": {
+      "player_id": "1069295",
+      "teams_history": "C",
+      "_legacy": {
+        "os": 0,
+        "od": 0,
+        "vs": 0,
+        "vd": 0,
+        "seasons": 0
+      },
+      "seasons": {
+        "2024": {
+          "os": 2,
+          "od": 2,
+          "vs": 2,
+          "vd": 2
+        },
+        "2025": {
+          "os": 6,
+          "od": 6,
+          "vs": 6,
+          "vd": 6
+        }
+      }
+    },
+    "Honza Bubeník": {
+      "player_id": null,
+      "teams_history": "C",
+      "_legacy": {
+        "os": 30,
+        "od": 30,
+        "vs": 8,
+        "vd": 9,
+        "seasons": 7
+      },
+      "seasons": {
+        "2024": {
+          "os": 2,
+          "od": 2,
+          "vs": 2,
+          "vd": 2
+        },
+        "2025": {
+          "os": 3,
+          "od": 2,
+          "vs": 3,
+          "vd": 2
+        }
+      }
+    },
+    "Šimon": {
+      "player_id": null,
+      "teams_history": "C",
+      "_legacy": {
+        "os": 11,
+        "od": 10,
+        "vs": 1,
+        "vd": 1,
+        "seasons": 5
+      },
+      "seasons": {
+        "2024": {
+          "os": 3,
+          "od": 3,
+          "vs": 1,
+          "vd": 3
+        },
+        "2025": {
+          "os": 1,
+          "od": 1,
+          "vs": 1,
+          "vd": 1
+        }
+      }
+    },
+    "Honza Königsmark": {
+      "player_id": null,
+      "teams_history": "C",
+      "_legacy": {
+        "os": 5,
+        "od": 4,
+        "vs": 0,
+        "vd": 0,
+        "seasons": 3
+      },
+      "seasons": {
+        "2024": {
+          "os": 2,
+          "od": 2,
+          "vs": 1,
+          "vd": 2
+        },
+        "2025": {
+          "os": 2,
+          "od": 2,
+          "vs": 2,
+          "vd": 2
+        }
+      }
+    },
+    "Ondra": {
+      "player_id": null,
+      "teams_history": "C",
+      "_legacy": {
+        "os": 0,
+        "od": 0,
+        "vs": 0,
+        "vd": 0,
+        "seasons": 0
+      },
+      "seasons": {
+        "2024": {
+          "os": 1,
+          "od": 1,
+          "vs": 1,
+          "vd": 1
+        },
+        "2025": {
+          "os": 0,
+          "od": 0,
+          "vs": 0,
+          "vd": 0
+        }
+      }
+    },
+    "Radim": {
+      "player_id": "1015429",
+      "teams_history": "C",
+      "_legacy": {
+        "os": 0,
+        "od": 0,
+        "vs": 0,
+        "vd": 0,
+        "seasons": 1
+      },
+      "seasons": {
+        "2024": {
+          "os": 2,
+          "od": 2,
+          "vs": 1,
+          "vd": 0
+        },
+        "2025": {
+          "os": 0,
+          "od": 0,
+          "vs": 0,
+          "vd": 0
+        }
+      }
+    },
+    "Kuba Šimek": {
+      "player_id": null,
+      "teams_history": "C",
+      "_legacy": {
+        "os": 0,
+        "od": 0,
+        "vs": 0,
+        "vd": 0,
+        "seasons": 0
+      },
+      "seasons": {
+        "2024": {
+          "os": 0,
+          "od": 1,
+          "vs": 0,
+          "vd": 0
+        },
+        "2025": {
+          "os": 0,
+          "od": 0,
+          "vs": 0,
+          "vd": 0
+        }
+      }
+    },
+    "Klárka": {
+      "player_id": null,
+      "teams_history": "C",
+      "_legacy": {
+        "os": 0,
+        "od": 0,
+        "vs": 0,
+        "vd": 0,
+        "seasons": 0
+      },
+      "seasons": {
+        "2024": {
+          "os": 5,
+          "od": 5,
+          "vs": 3,
+          "vd": 2
+        },
+        "2025": {
+          "os": 3,
+          "od": 3,
+          "vs": 0,
+          "vd": 0
+        }
+      }
+    },
+    "Anička": {
+      "player_id": null,
+      "teams_history": "C",
+      "_legacy": {
+        "os": 0,
+        "od": 0,
+        "vs": 0,
+        "vd": 0,
+        "seasons": 0
+      },
+      "seasons": {
+        "2024": {
+          "os": 1,
+          "od": 1,
+          "vs": 0,
+          "vd": 0
+        },
+        "2025": {
+          "os": 1,
+          "od": 2,
+          "vs": 1,
+          "vd": 0
+        }
+      }
+    },
+    "Kačka": {
+      "player_id": null,
+      "teams_history": "C",
+      "_legacy": {
+        "os": 0,
+        "od": 0,
+        "vs": 0,
+        "vd": 0,
+        "seasons": 0
+      },
+      "seasons": {
+        "2025": {
+          "os": 4,
+          "od": 4,
+          "vs": 2,
+          "vd": 1
+        }
+      }
+    },
+    "Martin Jech": {
+      "player_id": null,
+      "teams_history": "B",
+      "_legacy": {
+        "os": 0,
+        "od": 0,
+        "vs": 0,
+        "vd": 0,
+        "seasons": 0
+      },
+      "seasons": {
+        "2024": {
+          "os": 1,
+          "od": 1,
+          "vs": 1,
+          "vd": 1
+        },
+        "2025": {
+          "os": 5,
+          "od": 5,
+          "vs": 2,
+          "vd": 2
+        }
+      }
+    },
+    "Jirka Doležel": {
+      "player_id": null,
+      "teams_history": "B",
+      "_legacy": {
+        "os": 0,
+        "od": 0,
+        "vs": 0,
+        "vd": 0,
+        "seasons": 0
+      },
+      "seasons": {
+        "2024": {
+          "os": 2,
+          "od": 2,
+          "vs": 2,
+          "vd": 2
+        },
+        "2025": {
+          "os": 3,
+          "od": 4,
+          "vs": 0,
+          "vd": 2
+        }
+      }
+    },
+    "Honza Hýbl st.": {
+      "player_id": null,
+      "teams_history": "B",
+      "_legacy": {
+        "os": 0,
+        "od": 0,
+        "vs": 0,
+        "vd": 0,
+        "seasons": 0
+      },
+      "seasons": {
+        "2024": {
+          "os": 3,
+          "od": 4,
+          "vs": 3,
+          "vd": 3
+        },
+        "2025": {
+          "os": 3,
+          "od": 3,
+          "vs": 2,
+          "vd": 2
+        }
+      }
+    },
+    "Radovan Čambor": {
+      "player_id": null,
+      "teams_history": "B",
+      "_legacy": {
+        "os": 0,
+        "od": 0,
+        "vs": 0,
+        "vd": 0,
+        "seasons": 0
+      },
+      "seasons": {
+        "2024": {
+          "os": 2,
+          "od": 0,
+          "vs": 2,
+          "vd": 0
+        },
+        "2025": {
+          "os": 4,
+          "od": 3,
+          "vs": 1,
+          "vd": 2
+        }
+      }
+    },
+    "Tomáš Pikula": {
+      "player_id": null,
+      "teams_history": "B",
+      "_legacy": {
+        "os": 0,
+        "od": 0,
+        "vs": 0,
+        "vd": 0,
+        "seasons": 0
+      },
+      "seasons": {
+        "2024": {
+          "os": 1,
+          "od": 1,
+          "vs": 1,
+          "vd": 1
+        },
+        "2025": {
+          "os": 2,
+          "od": 0,
+          "vs": 0,
+          "vd": 0
+        }
+      }
+    },
+    "Honza Hýbl ml.": {
+      "player_id": null,
+      "teams_history": "B",
+      "_legacy": {
+        "os": 0,
+        "od": 0,
+        "vs": 0,
+        "vd": 0,
+        "seasons": 0
+      },
+      "seasons": {
+        "2024": {
+          "os": 3,
+          "od": 2,
+          "vs": 3,
+          "vd": 2
+        },
+        "2025": {
+          "os": 2,
+          "od": 3,
+          "vs": 1,
+          "vd": 2
+        }
+      }
+    },
+    "Boris": {
+      "player_id": null,
+      "teams_history": "B",
+      "_legacy": {
+        "os": 0,
+        "od": 0,
+        "vs": 0,
+        "vd": 0,
+        "seasons": 0
+      },
+      "seasons": {
+        "2024": {
+          "os": 2,
+          "od": 1,
+          "vs": 1,
+          "vd": 0
+        },
+        "2025": {
+          "os": 3,
+          "od": 3,
+          "vs": 0,
+          "vd": 0
+        }
+      }
+    },
+    "Péťa Bělov": {
+      "player_id": null,
+      "teams_history": "B",
+      "_legacy": {
+        "os": 0,
+        "od": 0,
+        "vs": 0,
+        "vd": 0,
+        "seasons": 0
+      },
+      "seasons": {
+        "2024": {
+          "os": 1,
+          "od": 3,
+          "vs": 0,
+          "vd": 2
+        },
+        "2025": {
+          "os": 3,
+          "od": 2,
+          "vs": 1,
+          "vd": 0
+        }
+      }
+    },
+    "Tadeáš Přibyl": {
+      "player_id": null,
+      "teams_history": "B",
+      "_legacy": {
+        "os": 0,
+        "od": 0,
+        "vs": 0,
+        "vd": 0,
+        "seasons": 0
+      },
+      "seasons": {
+        "2024": {
+          "os": 0,
+          "od": 2,
+          "vs": 0,
+          "vd": 2
+        },
+        "2025": {
+          "os": 2,
+          "od": 2,
+          "vs": 1,
+          "vd": 0
+        }
+      }
+    },
+    "Honza Tichý": {
+      "player_id": null,
+      "teams_history": "B",
+      "_legacy": {
+        "os": 0,
+        "od": 0,
+        "vs": 0,
+        "vd": 0,
+        "seasons": 1
+      },
+      "seasons": {
+        "2024": {
+          "os": 1,
+          "od": 1,
+          "vs": 0,
+          "vd": 1
+        },
+        "2025": {
+          "os": 0,
+          "od": 0,
+          "vs": 0,
+          "vd": 0
+        }
+      }
+    },
+    "Lucka Klusáková": {
+      "player_id": null,
+      "teams_history": "B",
+      "_legacy": {
+        "os": 0,
+        "od": 0,
+        "vs": 0,
+        "vd": 0,
+        "seasons": 0
+      },
+      "seasons": {
+        "2024": {
+          "os": 4,
+          "od": 4,
+          "vs": 2,
+          "vd": 2
+        },
+        "2025": {
+          "os": 5,
+          "od": 6,
+          "vs": 1,
+          "vd": 1
+        }
+      }
+    },
+    "Míša Bušková": {
+      "player_id": null,
+      "teams_history": "B",
+      "_legacy": {
+        "os": 0,
+        "od": 0,
+        "vs": 0,
+        "vd": 0,
+        "seasons": 0
+      },
+      "seasons": {
+        "2024": {
+          "os": 4,
+          "od": 4,
+          "vs": 3,
+          "vd": 3
+        },
+        "2025": {
+          "os": 4,
+          "od": 4,
+          "vs": 0,
+          "vd": 0
+        }
+      }
+    },
+    "Lenka Boutineau": {
+      "player_id": null,
+      "teams_history": "",
+      "_legacy": {
+        "os": 0,
+        "od": 0,
+        "vs": 0,
+        "vd": 0,
+        "seasons": 0
+      },
+      "seasons": {
+        "2025": {
+          "os": 5,
+          "od": 4,
+          "vs": 0,
+          "vd": 1
+        }
+      }
+    },
+    "Tomáš Tichý": {
+      "player_id": null,
+      "teams_history": "",
+      "_legacy": {
+        "os": 0,
+        "od": 1,
+        "vs": 0,
+        "vd": 0,
+        "seasons": 1
+      },
+      "seasons": {
+        "2024": {
+          "os": 4,
+          "od": 4,
+          "vs": 4,
+          "vd": 3
+        }
+      }
+    },
+    "Lenka Tichá": {
+      "player_id": null,
+      "teams_history": "",
+      "_legacy": {
+        "os": 10,
+        "od": 10,
+        "vs": 2,
+        "vd": 4,
+        "seasons": 1
+      },
+      "seasons": {
+        "2024": {
+          "os": 2,
+          "od": 2,
+          "vs": 2,
+          "vd": 1
+        }
+      }
+    },
+    "Tříška Martin": {
+      "player_id": null,
+      "teams_history": "A",
+      "_legacy": {
+        "os": 43,
+        "od": 42,
+        "vs": 33,
+        "vd": 32,
+        "seasons": 7,
+        "_per_year": {
+          "2006": {
+            "os": 6,
+            "vs": 6,
+            "od": 6,
+            "vd": 6
+          },
+          "2007": {
+            "os": 7,
+            "vs": 5,
+            "od": 7,
+            "vd": 7
+          },
+          "2008": {
+            "os": 4,
+            "vs": 4,
+            "od": 5,
+            "vd": 3
+          },
+          "2009": {
+            "os": 6,
+            "vs": 3,
+            "od": 6,
+            "vd": 2
+          },
+          "2010": {
+            "os": 6,
+            "vs": 4,
+            "od": 5,
+            "vd": 5
+          },
+          "2011": {
+            "os": 7,
+            "vs": 7,
+            "od": 7,
+            "vd": 5
+          },
+          "2012": {
+            "os": 7,
+            "vs": 4,
+            "od": 6,
+            "vd": 4
+          }
+        }
+      },
+      "seasons": {}
+    }
+  }
+}
