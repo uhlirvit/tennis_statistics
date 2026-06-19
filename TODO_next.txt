@@ -17,18 +17,6 @@ TODO:
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 Prompts:
 - Also I am thinking of creating some plots and cool visualizations at the end of it all
+- Extract interesting fun-facts and special achievements automatically
