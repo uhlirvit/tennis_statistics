@@ -456,8 +456,8 @@
     },
     "Hýbl Jan st.": {
       "nickname": "Honza Hýbl st.",
-      "player_id": null,
-      "teams": "B",
+      "player_id": "4642",
+      "teams": "B, C, D",
       "_order": 22,
       "_legacy": {
         "os": 6,
@@ -466,7 +466,14 @@
         "vd": 5,
         "seasons": 2
       },
-      "seasons": {}
+      "seasons": {
+        "2026": {
+          "os": 6,
+          "od": 4,
+          "vs": 4,
+          "vd": 3
+        }
+      }
     },
     "Čambor Radovan": {
       "nickname": "Radovan",
@@ -491,8 +498,8 @@
     },
     "Hýbl Jan ml.": {
       "nickname": "Honza Hýbl ml.",
-      "player_id": null,
-      "teams": "B",
+      "player_id": "1016408",
+      "teams": "B, C, D",
       "_order": 24,
       "_legacy": {
         "os": 3,
@@ -501,7 +508,14 @@
         "vd": 1,
         "seasons": 2
       },
-      "seasons": {}
+      "seasons": {
+        "2026": {
+          "os": 3,
+          "od": 4,
+          "vs": 3,
+          "vd": 3
+        }
+      }
     },
     "Pikula Tomáš": {
       "nickname": "Tomáš Pikula",
@@ -841,32 +855,11 @@
         }
       }
     },
-    "Hýbl Jan": {
-      "nickname": "Hýbl Jan",
-      "player_id": "4642",
-      "teams": "C, D",
-      "_order": 40,
-      "_legacy": {
-        "os": 0,
-        "od": 0,
-        "vs": 0,
-        "vd": 0,
-        "seasons": 0
-      },
-      "seasons": {
-        "2026": {
-          "os": 3,
-          "od": 4,
-          "vs": 3,
-          "vd": 3
-        }
-      }
-    },
     "Klusáková Lucie": {
       "nickname": "Klusáková Lucie",
       "player_id": "35487",
       "teams": "C",
-      "_order": 41,
+      "_order": 40,
       "_legacy": {
         "os": 0,
         "od": 0,
@@ -887,7 +880,7 @@
       "nickname": "Nováček Kryštof",
       "player_id": "1043679",
       "teams": "D",
-      "_order": 42,
+      "_order": 41,
       "_legacy": {
         "os": 0,
         "od": 0,
@@ -908,7 +901,7 @@
       "nickname": "Schmidt Eric",
       "player_id": "1050454",
       "teams": "D",
-      "_order": 43,
+      "_order": 42,
       "_legacy": {
         "os": 0,
         "od": 0,

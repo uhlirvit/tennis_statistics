@@ -8,12 +8,20 @@ Aggregation logic: turn parsed round + match-record data into
 """
 
 
-def build_long_log(rounds: list[dict], match_records: dict[str, dict]) -> list[dict]:
+def build_long_log(
+    rounds: list[dict],
+    match_records: dict[str, dict],
+    name_overrides: dict | None = None,
+) -> list[dict]:
     """
     rounds: output of parse_rounds (each has zapas_id, date, opponent, kolo)
     match_records: zapas_id -> output of parse_match_record
+    name_overrides: optional {player_id: display_name} from name_overrides.csv;
+        applied here so every downstream sheet (Player Summary, Match Grid,
+        Match Log, Awards, All Club) sees the canonical name from the start.
     Returns one row per (round, position, our_player).
     """
+    overrides = name_overrides or {}
     log = []
     for rnd in rounds:
         zid = rnd["zapas_id"]
@@ -22,17 +30,25 @@ def build_long_log(rounds: list[dict], match_records: dict[str, dict]) -> list[d
             continue
         for pos in record["positions"]:
             for player in pos["our_players"]:
+                pid = player["player_id"]
+                display_name = (
+                    overrides.get(str(pid)) if pid else None
+                ) or player["name"]
                 log.append({
                     "kolo": rnd["kolo"],
                     "date": rnd["date"],
                     "opponent": rnd["opponent"],
                     "position": pos["position"],
                     "type": pos["type"],
-                    "player_name": player["name"],
-                    "player_id": player["player_id"],
+                    "player_name": display_name,
+                    "player_id": pid,
                     "result": pos["result"],
                     "partner": next(
-                        (p["name"] for p in pos["our_players"] if p["name"] != player["name"]),
+                        (
+                            overrides.get(str(p["player_id"])) or p["name"]
+                            for p in pos["our_players"]
+                            if p["name"] != player["name"]
+                        ),
                         None,
                     ),
                 })
@@ -133,26 +149,39 @@ AWARD_CATEGORIES = [
     ("Debl výhry", "vyhrano_debl", "integer", "databar_orange"),
 ]
 
+# Separate category set for the career history Awards sheet.
+# Uses Body Suma as the lead "club contribution" metric and adds
+# per-season averages + seasons count, which aren't in per-season awards.
+HISTORY_AWARD_CATEGORIES = [
+    ("Celkem bodů pro klub", "body_suma",       "integer", "databar_steelbl"),
+    ("MVP (Váženo)",         "body_vazeno",     "number",  "databar_blue"),
+    ("Singlový specialista", "uspesnost_singl", "percent", "colorscale"),
+    ("Deblový specialista",  "uspesnost_debl",  "percent", "colorscale"),
+    ("Nejvíce odehráno",     "odehrano_celkem", "integer", "databar_magenta"),
+    ("Odehráno sezon",       "sezony",          "integer", None),
+    ("Singl výhry",          "vyhrano_singl",   "integer", "databar_green"),
+    ("Debl výhry",           "vyhrano_debl",    "integer", "databar_orange"),
+    ("Ø singl výhry/sezonu", "avg_singl",       "number",  "databar_green"),
+    ("Ø debl výhry/sezonu",  "avg_debl",        "number",  "databar_orange"),
+    ("Ø váženo/sezonu",      "avg_vazeno",      "number",  "databar_blue"),
+]
 
-def compute_oceneni(summary: list[dict]) -> dict:
-    """
-    Replicates the 'Oceneni' awards table from the existing Excel: for
-    each category, every player ranked by that category's metric,
-    descending. Excel's SORTBY/SORT(...,-1) -- which is what the
-    original sheet uses -- are stable sorts, so ties keep their
-    original (roster) order; Python's sorted(reverse=True) has the same
-    guarantee, which is why `summary` should already be roster-ordered
-    (via order_by_roster) before this is called.
 
-    A None success-rate (nobody played that discipline yet) is treated
-    as 0 here, matching what the original Oceneni table displays --
-    even though the Player Summary tab shows it blank instead.
+def compute_oceneni(summary: list[dict], categories_def=None) -> dict:
     """
+    Replicates the 'Oceneni' awards table: for each category, every player
+    ranked by that category's metric descending. Ties keep their existing
+    order (stable sort), so pass a roster-ordered summary for per-team use.
+    categories_def defaults to AWARD_CATEGORIES; pass HISTORY_AWARD_CATEGORIES
+    for the career history sheet (which has extra fields like sezony, avg_*).
+    None values are treated as 0 so every player appears in every ranking.
+    """
+    cats = categories_def if categories_def is not None else AWARD_CATEGORIES
     result = {}
-    for label, field, _kind, _cf in AWARD_CATEGORIES:
+    for label, field, _kind, _cf in cats:
         ranked = sorted(
             summary,
-            key=lambda s: s[field] if s[field] is not None else 0,
+            key=lambda s: s.get(field) if s.get(field) is not None else 0,
             reverse=True,
         )
         result[label] = [
@@ -259,6 +288,56 @@ def _save_store(store: dict, path: str):
         _json.dump(store, f, ensure_ascii=False, indent=2)
 
 
+NAME_OVERRIDES_PATH = "name_overrides.csv"
+
+
+def _load_name_overrides(path: str = NAME_OVERRIDES_PATH) -> dict[str, str]:
+    """
+    Loads player_id → canonical_display_name mappings from name_overrides.csv.
+    Used to correctly match players whose website name differs from their
+    store name (e.g. 'Hýbl Jan' → 'Hýbl Jan st.' or 'Hýbl Jan ml.').
+    Returns empty dict if the file doesn't exist or has no valid rows yet.
+    """
+    overrides: dict[str, str] = {}
+    p = _Path(path)
+    if not p.exists():
+        return overrides
+    import csv as _csv
+    with open(p, encoding="utf-8") as f:
+        for row in _csv.DictReader(f):
+            pid = (row.get("player_id") or "").strip()
+            name = (row.get("display_name") or "").strip()
+            if pid and name and not pid.startswith("#") and not pid.startswith("FILL_IN"):
+                overrides[pid] = name
+    return overrides
+
+
+NAME_OVERRIDES_PATH = "name_overrides.csv"
+
+
+def _load_name_overrides(path: str = NAME_OVERRIDES_PATH) -> dict:
+    """
+    Load player_id → canonical_name from name_overrides.csv.
+    Lines starting with '#' are treated as comments and skipped.
+    Placeholder IDs ('FILL_IN_...') are also ignored.
+    Returns empty dict if the file doesn't exist.
+    """
+    import csv as _csv
+    overrides: dict[str, str] = {}
+    p = _Path(path)
+    if not p.exists():
+        return overrides
+    with open(p, encoding="utf-8") as f:
+        # Filter out comment lines before handing to DictReader
+        data_lines = (line for line in f if not line.lstrip().startswith("#"))
+        for row in _csv.DictReader(data_lines):
+            pid  = row.get("player_id",    "").strip()
+            name = row.get("display_name", "").strip()
+            if pid and name and not pid.startswith("FILL_IN"):
+                overrides[pid] = name
+    return overrides
+
+
 def update_history_store(
     season_year: str,
     team_bundles: list[tuple[str, dict]],
@@ -271,11 +350,18 @@ def update_history_store(
     for the same season (e.g. mid-season then end-of-season) is safe --
     the second run simply replaces the first.
 
-    Also updates `teams_history` to reflect any new teams the player
-    appeared for in this season (lifetime union, never shrinks).
+    Player matching priority:
+      1. name_overrides.csv  (player_id → canonical name, handles
+         disambiguation like Hýbl Jan st. vs Hýbl Jan ml.)
+      2. player_id lookup in store
+      3. exact scraped name match
+      4. new entry (genuinely new player)
     """
     store = _load_store(store_path)
     players = store.setdefault("players", {})
+    overrides = _load_name_overrides()  # player_id → canonical store name
+    if overrides:
+        print(f"  History: loaded {len(overrides)} name override(s)")
 
     # Build lookup: player_id → store key name (for fast matching)
     id_to_store_name: dict[str, str] = {}
@@ -292,9 +378,24 @@ def update_history_store(
         scraped_name = s["player_name"]
         season_teams = "/".join(teams_by_id.get(pid, []))
 
-        # Find existing store entry: by player_id first, then exact name
-        if pid and pid in id_to_store_name:
+        # 1. name_overrides.csv: player_id → canonical name
+        if pid and pid in overrides:
+            store_name = overrides[pid]
+            if store_name not in players:
+                print(f"  History: WARNING override maps {pid} → '{store_name}' "
+                      f"but that name isn't in the store yet")
+                continue
+            # Backfill player_id in store entry if not set
+            if not players[store_name].get("player_id"):
+                players[store_name]["player_id"] = pid
+                id_to_store_name[pid] = store_name
+                print(f"  History: linked player_id {pid} to '{store_name}' via override")
+
+        # 2. player_id lookup in store
+        elif pid and pid in id_to_store_name:
             store_name = id_to_store_name[pid]
+
+        # 3. exact scraped name match
         elif scraped_name in players:
             store_name = scraped_name
             # Backfill player_id if we now know it
@@ -302,11 +403,12 @@ def update_history_store(
                 players[store_name]["player_id"] = pid
                 id_to_store_name[pid] = store_name
                 print(f"  History: linked player_id {pid} to existing entry '{store_name}'")
+
+        # 4. genuinely new player
         else:
-            # Genuinely new player not yet in store
             store_name = scraped_name
             players[store_name] = {
-                "nickname":  scraped_name,  # website name as fallback nick
+                "nickname":  scraped_name,
                 "player_id": pid,
                 "teams":     "",
                 "_order":    max((e.get("_order", 0) for e in players.values()), default=0) + 1,

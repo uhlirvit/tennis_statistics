@@ -81,9 +81,11 @@ from fetch import fetch
 from parser import parse_roster, parse_rounds, parse_match_record, parse_club_display_name
 from aggregate import (
     build_long_log, compute_player_summary, order_by_roster,
-    compute_oceneni, AWARD_CATEGORIES, build_wide_grid, compute_all_club_summary,
+    compute_oceneni, AWARD_CATEGORIES, HISTORY_AWARD_CATEGORIES,
+    build_wide_grid, compute_all_club_summary,
     update_history_store, compute_history_rows,
     HISTORY_STORE_PATH, LEGACY_LABEL,
+    _load_name_overrides,
 )
 
 # ---------------------------------------------------------------- CONFIG
@@ -183,7 +185,8 @@ def process_one_team(entry):
         except RuntimeError as e:
             print(f"    WARNING: {e}")
 
-    long_log = build_long_log(rounds, match_records)
+    long_log = build_long_log(rounds, match_records,
+                               name_overrides=_load_name_overrides())
     if match_records and not long_log:
         raise RuntimeError(
             f"Fetched {len(match_records)} match record(s) but extracted 0 player "
@@ -265,17 +268,21 @@ HEADER_FONT = Font(bold=True)
 
 # Exact colors pulled from the original workbook's conditional formatting
 # rules (same metric -> same color in both the main table and Oceneni).
-DATABAR_GREEN = "FF63C384"    # Vyhrano singl
-DATABAR_ORANGE = "FFFFB628"   # Vyhrano debl
-DATABAR_BLUE = "FF008AEF"     # Body Vazeno
-SCALE_RED = "FFF8696B"        # Uspesnost -- low end
-SCALE_YELLOW = "FFFFEB84"     # Uspesnost -- midpoint (50th percentile)
-SCALE_GREEN = "FF63BE7B"      # Uspesnost -- high end
+DATABAR_GREEN    = "FF63C384"    # Vyhrano singl
+DATABAR_ORANGE   = "FFFFB628"    # Vyhrano debl
+DATABAR_BLUE     = "FF008AEF"    # Body Vazeno / MVP
+DATABAR_STEELBL  = "FF638EC6"    # Body Suma / Celkem bodů
+DATABAR_MAGENTA  = "FFD6007B"    # Nejvíce odehráno (matches original Excel)
+SCALE_RED        = "FFF8696B"    # Uspesnost -- low end
+SCALE_YELLOW     = "FFFFEB84"    # Uspesnost -- midpoint (50th percentile)
+SCALE_GREEN      = "FF63BE7B"    # Uspesnost -- high end
 
 CF_DATABARS = {
-    "databar_green": DATABAR_GREEN,
-    "databar_orange": DATABAR_ORANGE,
-    "databar_blue": DATABAR_BLUE,
+    "databar_green":   DATABAR_GREEN,
+    "databar_orange":  DATABAR_ORANGE,
+    "databar_blue":    DATABAR_BLUE,
+    "databar_steelbl": DATABAR_STEELBL,
+    "databar_magenta": DATABAR_MAGENTA,
 }
 
 
@@ -412,15 +419,16 @@ def add_team_sheets(wb, team_label, roster, rounds, long_log, summary, wide):
     _add_awards_sheet(wb, _sheet_name(team_label, "Awards"), summary)
 
 
-def _add_awards_sheet(wb, sheet_name, summary):
+def _add_awards_sheet(wb, sheet_name, summary, categories_def=None):
     """Builds one Awards/ranking sheet from a player summary list.
-    Shared by add_team_sheets (per-team) and add_all_club_sheets
-    (cross-team) since the ranking logic is identical either way --
-    only which summary list feeds it differs."""
+    categories_def: list of (label, field, kind, cf_kind) tuples.
+    Defaults to AWARD_CATEGORIES (per-team). Pass HISTORY_AWARD_CATEGORIES
+    for the career history sheet."""
+    cats = categories_def if categories_def is not None else AWARD_CATEGORIES
     ws4 = wb.create_sheet(sheet_name)
-    oceneni = compute_oceneni(summary)
+    oceneni = compute_oceneni(summary, cats)
     categories = list(oceneni.keys())
-    percent_cats = {label for label, _field, kind, _cf in AWARD_CATEGORIES if kind == "percent"}
+    percent_cats = {label for label, _field, kind, _cf in cats if kind == "percent"}
 
     ws4.cell(row=1, column=1, value="Pořadí")
     col = 2
@@ -459,7 +467,7 @@ def _add_awards_sheet(wb, sheet_name, summary):
         col += 2
 
     last_row_oc = 2 + len(summary)
-    cf_for_category = {label: cf for label, _field, _kind, cf in AWARD_CATEGORIES}
+    cf_for_category = {label: cf for label, _field, _kind, cf in cats}
     for cat in categories:
         cf_kind = cf_for_category.get(cat)
         col_letter = get_column_letter(hodnota_col_for_category[cat])
@@ -615,19 +623,35 @@ def write_history_workbook(path: str, store_path: str = HISTORY_STORE_PATH):
         _add_databar(ws1, get_column_letter(12), 3, last_row, DATABAR_BLUE)   # váženo
 
     # ====== Sheet 2: Ocenění (Awards) ===============================
-    _add_awards_sheet(wb, "Ocenění",
-                      [{"player_name": r["name"], **r["lifetime"],
-                        "odehrano_singl": r["lifetime"]["os"],
-                        "odehrano_debl":  r["lifetime"]["od"],
-                        "odehrano_celkem":r["lifetime"]["celkem"],
-                        "vyhrano_singl":  r["lifetime"]["vs"],
-                        "vyhrano_debl":   r["lifetime"]["vd"],
-                        "uspesnost_singl":r["lifetime"]["us_singl"],
-                        "uspesnost_debl": r["lifetime"]["us_debl"],
-                        "body_suma":      r["lifetime"]["suma"],
-                        "body_vazeno":    r["lifetime"]["vazeno"],
-                        "player_id":      r["player_id"],
-                       } for r in rows_by_vaz])
+    # Build an adapted summary list with all the fields HISTORY_AWARD_CATEGORIES
+    # references, including sezony and per-season averages.
+    def _hist_summary(rows_sorted):
+        adapted = []
+        for r in rows_sorted:
+            lt = r["lifetime"]
+            sez = lt["seasons"]
+            adapted.append({
+                "player_name":    r["name"],
+                "odehrano_singl": lt["os"],
+                "odehrano_debl":  lt["od"],
+                "odehrano_celkem":lt["celkem"],
+                "vyhrano_singl":  lt["vs"],
+                "vyhrano_debl":   lt["vd"],
+                "uspesnost_singl":lt["us_singl"],
+                "uspesnost_debl": lt["us_debl"],
+                "body_suma":      lt["suma"],
+                "body_vazeno":    lt["vazeno"],
+                "player_id":      r["player_id"],
+                "sezony":         sez,
+                "avg_singl": round(lt["vs"] / sez, 2) if sez else 0,
+                "avg_debl":  round(lt["vd"] / sez, 2) if sez else 0,
+                "avg_suma":  round(lt["suma"] / sez, 2) if sez else 0,
+                "avg_vazeno":round(lt["vazeno"] / sez, 2) if sez else 0,
+            })
+        return adapted
+
+    _add_awards_sheet(wb, "Ocenění", _hist_summary(rows_by_vaz),
+                      categories_def=HISTORY_AWARD_CATEGORIES)
 
     # ====== Sheet 3: Sezony (Per-season breakdown) ==================
     ws3 = wb.create_sheet("Sezony")

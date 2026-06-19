@@ -1,0 +1,10 @@
+# Maps player_id (from cesky-tenis.cz) to the canonical display name used
+# in history_store.json and all output files.
+# Used when the website shows the same name for two different people, or
+# when a display name needs a disambiguation suffix.
+#
+# Format: player_id,display_name
+# Find a player's ID from their profile URL: cesky-tenis.cz/hrac/{id}
+player_id,display_name
+4642,Hýbl Jan st.
+1016408,Hýbl Jan ml.
