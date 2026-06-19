@@ -225,3 +225,211 @@ def compute_all_club_summary(team_bundles: list[tuple[str, dict]]) -> list[dict]
         s["teams"] = "/".join(teams_by_player_id.get(s["player_id"], []))
     summary.sort(key=lambda s: s["body_vazeno"], reverse=True)
     return summary
+
+
+# ---- History store (persistent JSON accumulator) -------------------------
+
+import json as _json
+from pathlib import Path as _Path
+
+HISTORY_STORE_PATH = "history_store.json"
+LEGACY_LABEL = "do 2025"   # display label for the through-2025 baseline block
+
+
+def _load_store(path: str) -> dict:
+    p = _Path(path)
+    if p.exists():
+        try:
+            with open(p, encoding="utf-8") as f:
+                return _json.load(f)
+        except _json.JSONDecodeError as e:
+            raise RuntimeError(
+                f"\n\nCould not parse {p} as JSON: {e}\n\n"
+                f"Most likely cause: the file is corrupt, truncated, or is an older\n"
+                f"version from a previous run.  Fix: regenerate it by running:\n\n"
+                f"    python3 import_history.py\n\n"
+                f"(make sure EXCEL_PATH at the top of that script points to your\n"
+                f"current Statistika_mistraky.xlsx)"
+            ) from e
+    return {"_meta": {}, "players": {}}
+
+
+def _save_store(store: dict, path: str):
+    with open(path, "w", encoding="utf-8") as f:
+        _json.dump(store, f, ensure_ascii=False, indent=2)
+
+
+def update_history_store(
+    season_year: str,
+    team_bundles: list[tuple[str, dict]],
+    store_path: str = HISTORY_STORE_PATH,
+):
+    """
+    Called by main.py after every dospeli season is processed.
+    For each player in the combined all-club summary, writes (or overwrites)
+    their stats for `season_year` in the history store.  Running this twice
+    for the same season (e.g. mid-season then end-of-season) is safe --
+    the second run simply replaces the first.
+
+    Also updates `teams_history` to reflect any new teams the player
+    appeared for in this season (lifetime union, never shrinks).
+    """
+    store = _load_store(store_path)
+    players = store.setdefault("players", {})
+
+    # Build lookup: player_id → store key name (for fast matching)
+    id_to_store_name: dict[str, str] = {}
+    for name, entry in players.items():
+        pid = entry.get("player_id")
+        if pid:
+            id_to_store_name[pid] = name
+
+    combined_log, teams_by_id = merge_long_logs(team_bundles)
+    season_summary = compute_player_summary(combined_log)
+
+    for s in season_summary:
+        pid = s.get("player_id")
+        scraped_name = s["player_name"]
+        season_teams = "/".join(teams_by_id.get(pid, []))
+
+        # Find existing store entry: by player_id first, then exact name
+        if pid and pid in id_to_store_name:
+            store_name = id_to_store_name[pid]
+        elif scraped_name in players:
+            store_name = scraped_name
+            # Backfill player_id if we now know it
+            if pid and not players[store_name].get("player_id"):
+                players[store_name]["player_id"] = pid
+                id_to_store_name[pid] = store_name
+                print(f"  History: linked player_id {pid} to existing entry '{store_name}'")
+        else:
+            # Genuinely new player not yet in store
+            store_name = scraped_name
+            players[store_name] = {
+                "nickname":  scraped_name,  # website name as fallback nick
+                "player_id": pid,
+                "teams":     "",
+                "_order":    max((e.get("_order", 0) for e in players.values()), default=0) + 1,
+                "_legacy": {"os": 0, "od": 0, "vs": 0, "vd": 0, "seasons": 0},
+                "seasons": {},
+            }
+            if pid:
+                id_to_store_name[pid] = store_name
+            print(f"  History: added new player '{store_name}'")
+
+        # Write / overwrite this season's data
+        players[store_name]["seasons"][season_year] = {
+            "os": s["odehrano_singl"],
+            "od": s["odehrano_debl"],
+            "vs": s["vyhrano_singl"],
+            "vd": s["vyhrano_debl"],
+        }
+
+        # Expand teams field (union of all seasons, never shrinks)
+        existing_teams = {
+            t.strip()
+            for t in players[store_name].get("teams", "").split(",")
+            if t.strip()
+        }
+        new_teams = {t.strip() for t in season_teams.split("/") if t.strip()}
+        merged = sorted(existing_teams | new_teams)
+        players[store_name]["teams"] = ", ".join(merged)
+
+    _save_store(store, store_path)
+
+
+def compute_history_rows(store_path: str = HISTORY_STORE_PATH) -> dict:
+    """
+    Read history_store.json and produce rows for the history sheet.
+
+    Returns:
+        {
+          "rows": [
+            {
+              "name": str,
+              "teams": str,           # lifetime teams string
+              "player_id": str|None,
+              "lifetime": {os, od, celkem, vs, vd, us_singl, us_debl, suma, vazeno, seasons},
+              "seasons": {
+                LEGACY_LABEL: {os, od, vs, vd, vazeno},
+                "2024":       {os, od, vs, vd, vazeno},
+                "2025":       {os, od, vs, vd, vazeno},
+                ...
+              }
+            }, ...
+          ],
+          "season_labels": [LEGACY_LABEL, "2024", "2025", ...]  # ordered
+        }
+
+    Rows are sorted by lifetime Body Váženo descending.
+    Úspěšnost uses the same ≥5-match threshold as the original Excel
+    (IF(singl_played < 5, 0, vyhráno/odehráno)).
+    """
+    store = _load_store(store_path)
+    players = store.get("players", {})
+
+    # Collect all scraped year labels in ascending order
+    scraped_years: set[str] = set()
+    for entry in players.values():
+        scraped_years.update(entry.get("seasons", {}).keys())
+    season_labels = [LEGACY_LABEL] + sorted(scraped_years)
+
+    rows = []
+    for name, entry in players.items():
+        leg = entry.get("_legacy", {})
+        seasons = entry.get("seasons", {})
+
+        # Lifetime totals (legacy + all scraped seasons)
+        os_ = leg.get("os", 0) + sum(s["os"] for s in seasons.values())
+        od_ = leg.get("od", 0) + sum(s["od"] for s in seasons.values())
+        vs_ = leg.get("vs", 0) + sum(s["vs"] for s in seasons.values())
+        vd_ = leg.get("vd", 0) + sum(s["vd"] for s in seasons.values())
+        sez = leg.get("seasons", 0) + sum(
+            1 for s in seasons.values() if s["os"] + s["od"] > 0
+        )
+
+        # Úspěšnost with ≥5 match threshold (matches original Excel formula)
+        us_s = (vs_ / os_) if os_ >= 5 else (0.0 if os_ > 0 else None)
+        us_d = (vd_ / od_) if od_ >= 5 else (0.0 if od_ > 0 else None)
+
+        # Per-season breakdown: legacy block + one block per scraped year
+        season_data = {}
+        leg_vaz = leg.get("vs", 0) + 0.5 * leg.get("vd", 0)
+        season_data[LEGACY_LABEL] = {
+            "os":     leg.get("os", 0),
+            "od":     leg.get("od", 0),
+            "vs":     leg.get("vs", 0),
+            "vd":     leg.get("vd", 0),
+            "vazeno": leg_vaz,
+            "seasons": leg.get("seasons", 0),
+        }
+        for year in sorted(scraped_years):
+            s = seasons.get(year, {"os": 0, "od": 0, "vs": 0, "vd": 0})
+            season_data[year] = {
+                "os":    s["os"],
+                "od":    s["od"],
+                "vs":    s["vs"],
+                "vd":    s["vd"],
+                "vazeno": s["vs"] + 0.5 * s["vd"],
+            }
+
+        rows.append({
+            "name":      name,
+            "nickname":  entry.get("nickname", ""),
+            "teams":     entry.get("teams", ""),
+            "player_id": entry.get("player_id"),
+            "_order":    entry.get("_order", 999),
+            "lifetime": {
+                "os": os_, "od": od_, "celkem": os_ + od_,
+                "vs": vs_, "vd": vd_,
+                "us_singl": us_s, "us_debl": us_d,
+                "suma": vs_ + vd_, "vazeno": vs_ + 0.5 * vd_,
+                "seasons": sez,
+            },
+            "seasons": season_data,
+        })
+
+    # Player Summary sheet preserves the user's table order (_order).
+    # The Awards and per-season sheets sort by Body Váženo instead.
+    rows.sort(key=lambda r: r["_order"])
+    return {"rows": rows, "season_labels": season_labels}

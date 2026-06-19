@@ -82,6 +82,8 @@ from parser import parse_roster, parse_rounds, parse_match_record, parse_club_di
 from aggregate import (
     build_long_log, compute_player_summary, order_by_roster,
     compute_oceneni, AWARD_CATEGORIES, build_wide_grid, compute_all_club_summary,
+    update_history_store, compute_history_rows,
+    HISTORY_STORE_PATH, LEGACY_LABEL,
 )
 
 # ---------------------------------------------------------------- CONFIG
@@ -209,6 +211,8 @@ def run_all():
     groups = group_teams(entries)
 
     summary_lines = []  # for the final printed report
+    dospeli_seasons_processed = []  # track (year, team_bundles) for history update
+
     for (season_year, category), group_entries in groups.items():
         print(f"{'=' * 60}\n{season_year} / {category}\n{'=' * 60}")
         team_bundles = []
@@ -229,8 +233,23 @@ def run_all():
             write_season_workbook(out_path, team_bundles)
             print(f"  Wrote: {out_path} ({len(team_bundles)} team(s): "
                   f"{', '.join(t for t, _ in team_bundles)})\n")
+
+            # Track dospeli seasons for the history update
+            if category == DEFAULT_CATEGORY:
+                dospeli_seasons_processed.append((season_year, team_bundles))
         else:
             print(f"  No teams succeeded for {season_year}/{category} -- nothing written.\n")
+
+    # Update history store and write history workbook for any dospeli seasons
+    if dospeli_seasons_processed:
+        print("=" * 60)
+        print("HISTORY UPDATE")
+        for season_year, team_bundles in dospeli_seasons_processed:
+            print(f"  Updating history store for {season_year} ...")
+            update_history_store(season_year, team_bundles)
+        hist_path = os.path.join(OUTPUT_DIR, "club_history_dospeli.xlsx")
+        write_history_workbook(hist_path)
+        print(f"  Wrote: {hist_path}\n")
 
     print("=" * 60)
     print("SUMMARY")
@@ -496,6 +515,176 @@ def add_all_club_sheets(wb, team_bundles):
 
     _add_awards_sheet(wb, "All Club - Awards", combined_summary)
 
+
+def write_history_workbook(path: str, store_path: str = HISTORY_STORE_PATH):
+    """
+    Create (or recreate) the standalone club history workbook with 3 sheets:
+
+    1. 'Souhrn'  — Player Summary matching the user's history table:
+                   Nickname | Jméno | Týmy | Odehráno | Vyhráno |
+                   Úspěšnost | Body | Sezony | per-season averages
+                   Row order: user's table order (_order field in JSON).
+
+    2. 'Ocenění' — Career award rankings (same 6 categories as per-team
+                   Awards sheet, but on career totals).
+
+    3. 'Sezony'  — Per-season breakdown.  Left block: fixed player info.
+                   Then one 5-column group per year key in the store
+                   (LEGACY_LABEL first, then 2026, 2027…).
+    """
+    history = compute_history_rows(store_path)
+    rows = history["rows"]          # sorted by _order (user's table order)
+    season_labels = history["season_labels"]
+
+    # Rows sorted by Body Váženo for Awards + Sezony sheets
+    rows_by_vaz = sorted(rows, key=lambda r: r["lifetime"]["vazeno"], reverse=True)
+
+    wb = Workbook()
+    wb.remove(wb.active)
+
+    # ====== Sheet 1: Souhrn (Player Summary) ========================
+    ws1 = wb.create_sheet("Souhrn")
+
+    # Header row 1: section groups (merged)
+    h1 = [
+        (1, 1, "Přezdívka"),
+        (2, 2, "Jméno"),
+        (3, 3, "Tým"),
+        (4, 6, "Odehráno"),
+        (7, 8, "Vyhráno"),
+        (9, 10, "Úspěšnost"),
+        (11, 12, "Body"),
+        (13, 13, "Sezony"),
+        (14, 17, "Ø za sezonu"),
+    ]
+    for (c1, c2, label) in h1:
+        if c1 == c2:
+            ws1.cell(row=1, column=c1, value=label)
+        else:
+            ws1.merge_cells(start_row=1, start_column=c1, end_row=1, end_column=c2)
+            ws1.cell(row=1, column=c1, value=label)
+    _style_header_row(ws1, 1, 17)
+
+    # Header row 2: individual column labels
+    cols2 = [
+        "Přezdívka", "Jméno", "Tým",
+        "singl", "debl", "celkem",
+        "singl výhra", "debl výhra",
+        "singl %", "debl %",
+        "Suma", "Váženo",
+        "Odehráno",
+        "Ø singl výhra", "Ø debl výhra", "Ø suma", "Ø váženo",
+    ]
+    for i, h in enumerate(cols2):
+        ws1.cell(row=2, column=i + 1, value=h)
+    _style_header_row(ws1, 2, 17)
+
+    for r_idx, player in enumerate(rows):
+        row = r_idx + 3
+        lt = player["lifetime"]
+        sez = lt["seasons"]
+        ws1.cell(row=row, column=1,  value=player["nickname"])
+        ws1.cell(row=row, column=2,  value=player["name"])
+        ws1.cell(row=row, column=3,  value=player["teams"])
+        ws1.cell(row=row, column=4,  value=lt["os"])
+        ws1.cell(row=row, column=5,  value=lt["od"])
+        ws1.cell(row=row, column=6,  value=lt["celkem"])
+        ws1.cell(row=row, column=7,  value=lt["vs"])
+        ws1.cell(row=row, column=8,  value=lt["vd"])
+        ws1.cell(row=row, column=9,  value=lt["us_singl"]).number_format = "0%"
+        ws1.cell(row=row, column=10, value=lt["us_debl"]).number_format  = "0%"
+        ws1.cell(row=row, column=11, value=lt["suma"])
+        ws1.cell(row=row, column=12, value=lt["vazeno"])
+        ws1.cell(row=row, column=13, value=sez)
+        # Per-season averages (only meaningful when sez > 0)
+        ws1.cell(row=row, column=14, value=round(lt["vs"] / sez, 1) if sez else None)
+        ws1.cell(row=row, column=15, value=round(lt["vd"] / sez, 1) if sez else None)
+        ws1.cell(row=row, column=16, value=round(lt["suma"] / sez, 1) if sez else None)
+        ws1.cell(row=row, column=17, value=round(lt["vazeno"] / sez, 1) if sez else None)
+
+    # Column widths
+    for c, w in enumerate([14, 22, 7, 7, 7, 8, 12, 12, 9, 9, 7, 8, 8, 14, 14, 8, 9], start=1):
+        ws1.column_dimensions[get_column_letter(c)].width = w
+
+    last_row = 2 + len(rows)
+    if last_row >= 3:
+        _add_databar(ws1, get_column_letter(7), 3, last_row, DATABAR_GREEN)   # singl výhra
+        _add_databar(ws1, get_column_letter(8), 3, last_row, DATABAR_ORANGE)  # debl výhra
+        _add_colorscale_ryg(ws1, get_column_letter(9), 3, last_row)           # úsp singl
+        _add_colorscale_ryg(ws1, get_column_letter(10), 3, last_row)          # úsp debl
+        _add_databar(ws1, get_column_letter(12), 3, last_row, DATABAR_BLUE)   # váženo
+
+    # ====== Sheet 2: Ocenění (Awards) ===============================
+    _add_awards_sheet(wb, "Ocenění",
+                      [{"player_name": r["name"], **r["lifetime"],
+                        "odehrano_singl": r["lifetime"]["os"],
+                        "odehrano_debl":  r["lifetime"]["od"],
+                        "odehrano_celkem":r["lifetime"]["celkem"],
+                        "vyhrano_singl":  r["lifetime"]["vs"],
+                        "vyhrano_debl":   r["lifetime"]["vd"],
+                        "uspesnost_singl":r["lifetime"]["us_singl"],
+                        "uspesnost_debl": r["lifetime"]["us_debl"],
+                        "body_suma":      r["lifetime"]["suma"],
+                        "body_vazeno":    r["lifetime"]["vazeno"],
+                        "player_id":      r["player_id"],
+                       } for r in rows_by_vaz])
+
+    # ====== Sheet 3: Sezony (Per-season breakdown) ==================
+    ws3 = wb.create_sheet("Sezony")
+    FIXED = 3          # Přezdívka | Jméno | Týmy
+    SEA_COLS = 5       # os | od | vs | vd | váž  per season block
+
+    # Row 1: section label + season block headers (merged)
+    ws3.cell(row=1, column=1, value="Přezdívka")
+    ws3.cell(row=1, column=2, value="Jméno")
+    ws3.cell(row=1, column=3, value="Tým")
+    col = FIXED + 1
+    for label in season_labels:
+        ws3.merge_cells(start_row=1, start_column=col, end_row=1, end_column=col + SEA_COLS - 1)
+        ws3.cell(row=1, column=col, value=label).alignment = Alignment(horizontal="center")
+        col += SEA_COLS
+    _style_header_row(ws3, 1, col - 1)
+
+    # Row 2: sub-column labels
+    ws3.cell(row=2, column=1, value="Přezdívka")
+    ws3.cell(row=2, column=2, value="Jméno")
+    ws3.cell(row=2, column=3, value="Tým")
+    sea_sub = ["singl", "debl", "singl výhry", "debl výhry", "body váženo"]
+    col = FIXED + 1
+    for _ in season_labels:
+        for i, h in enumerate(sea_sub):
+            ws3.cell(row=2, column=col + i, value=h)
+        col += SEA_COLS
+    _style_header_row(ws3, 2, col - 1)
+
+    for r_idx, player in enumerate(rows):
+        row = r_idx + 3
+        ws3.cell(row=row, column=1, value=player["nickname"])
+        ws3.cell(row=row, column=2, value=player["name"])
+        ws3.cell(row=row, column=3, value=player["teams"])
+        col = FIXED + 1
+        for label in season_labels:
+            s = player["seasons"].get(label, {})
+            ws3.cell(row=row, column=col,     value=s.get("os", 0) or None)
+            ws3.cell(row=row, column=col + 1, value=s.get("od", 0) or None)
+            ws3.cell(row=row, column=col + 2, value=s.get("vs", 0) or None)
+            ws3.cell(row=row, column=col + 3, value=s.get("vd", 0) or None)
+            ws3.cell(row=row, column=col + 4, value=s.get("vazeno", 0) or None)
+            col += SEA_COLS
+
+    # Column widths
+    ws3.column_dimensions["A"].width = 14
+    ws3.column_dimensions["B"].width = 22
+    ws3.column_dimensions["C"].width = 7
+    col = FIXED + 1
+    for _ in season_labels:
+        for i in range(SEA_COLS):
+            ws3.column_dimensions[get_column_letter(col + i)].width = 9
+        col += SEA_COLS
+
+    ws3.row_dimensions[1].height = 25
+
+    wb.save(path)
 
 def write_season_workbook(path, team_bundles):
     """team_bundles: list of (team_label, data_dict) pairs, where

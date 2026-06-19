@@ -1,900 +1,702 @@
 {
   "_meta": {
-    "note": "Persistent history accumulator for TK Sport Kolovraty dospeli. Legacy = aggregate - scraped seasons, computed from history tab formula outputs. Going forward, main.py appends new seasons here automatically.",
+    "note": "TK Sport Kolovraty dospeli history accumulator. _legacy = verified totals through end of 2025, imported directly from the club's manually maintained history table. seasons dict contains 2026 and future years from the scraper. Official names (Czech: Přijmení Jméno) are the primary keys. Each entry also carries a nickname field for display purposes.",
+    "legacy_label": "do 2025",
+    "triška_note": "Tříška Martin: played 2006-2012 (7 seasons), left, returned 2026. Per-year breakdown stored in _legacy._per_year. player_id null until matched from 2026 scrape output.",
+    "hýbl_note": "Hýbl Jan st. and Hýbl Jan ml. are disambiguated here. Website shows both as 'Hýbl Jan'. player_ids to be filled once B tým is matched via name_overrides.csv."
   },
   "players": {
-    "Marian": {
+    "Kubín Marian": {
+      "nickname": "Marian",
       "player_id": "1020475",
-      "teams_history": "A",
+      "teams": "A",
+      "_order": 0,
       "_legacy": {
-        "os": 19,
-        "od": 16,
-        "vs": 10,
-        "vd": 9,
-        "seasons": 4
+        "os": 33,
+        "od": 30,
+        "vs": 12,
+        "vd": 18,
+        "seasons": 6
       },
       "seasons": {
-        "2024": {
-          "os": 7,
-          "od": 7,
-          "vs": 1,
-          "vd": 6
-        },
-        "2025": {
-          "os": 7,
-          "od": 7,
-          "vs": 1,
+        "2026": {
+          "os": 5,
+          "od": 5,
+          "vs": 2,
           "vd": 3
         }
       }
     },
-    "Milan": {
+    "Válek Milan": {
+      "nickname": "Milan",
       "player_id": "1013864",
-      "teams_history": "A",
+      "teams": "A",
+      "_order": 1,
       "_legacy": {
-        "os": 30,
-        "od": 31,
-        "vs": 24,
-        "vd": 21,
+        "os": 40,
+        "od": 41,
+        "vs": 28,
+        "vd": 29,
+        "seasons": 7
+      },
+      "seasons": {
+        "2026": {
+          "os": 5,
+          "od": 3,
+          "vs": 2,
+          "vd": 2
+        }
+      }
+    },
+    "Uhlíř Vít": {
+      "nickname": "Víťa",
+      "player_id": "1007484",
+      "teams": "A, C",
+      "_order": 2,
+      "_legacy": {
+        "os": 88,
+        "od": 84,
+        "vs": 72,
+        "vd": 66,
+        "seasons": 15
+      },
+      "seasons": {
+        "2026": {
+          "os": 7,
+          "od": 5,
+          "vs": 6,
+          "vd": 4
+        }
+      }
+    },
+    "Břicháček Bedřich": {
+      "nickname": "Béďa",
+      "player_id": "1030702",
+      "teams": "A, B, C",
+      "_order": 3,
+      "_legacy": {
+        "os": 33,
+        "od": 30,
+        "vs": 22,
+        "vd": 17,
         "seasons": 5
       },
       "seasons": {
-        "2024": {
-          "os": 5,
-          "od": 4,
-          "vs": 3,
-          "vd": 4
-        },
-        "2025": {
-          "os": 5,
-          "od": 6,
-          "vs": 1,
-          "vd": 4
-        }
-      }
-    },
-    "Víťa": {
-      "player_id": "1007484",
-      "teams_history": "A, C",
-      "_legacy": {
-        "os": 73,
-        "od": 72,
-        "vs": 60,
-        "vd": 58,
-        "seasons": 13
-      },
-      "seasons": {
-        "2024": {
-          "os": 7,
-          "od": 7,
-          "vs": 5,
-          "vd": 4
-        },
-        "2025": {
-          "os": 8,
-          "od": 5,
-          "vs": 7,
-          "vd": 4
-        }
-      }
-    },
-    "Béďa": {
-      "player_id": "1030702",
-      "teams_history": "A, C",
-      "_legacy": {
-        "os": 14,
-        "od": 14,
-        "vs": 8,
-        "vd": 6,
-        "seasons": 3
-      },
-      "seasons": {
-        "2024": {
-          "os": 10,
-          "od": 9,
-          "vs": 7,
-          "vd": 7
-        },
-        "2025": {
-          "os": 9,
-          "od": 7,
-          "vs": 7,
-          "vd": 4
-        }
-      }
-    },
-    "Péťa": {
-      "player_id": "24335",
-      "teams_history": "A, C",
-      "_legacy": {
-        "os": 85,
-        "od": 81,
-        "vs": 76,
-        "vd": 58,
-        "seasons": 16
-      },
-      "seasons": {
-        "2024": {
+        "2026": {
           "os": 6,
-          "od": 4,
-          "vs": 6,
-          "vd": 3
-        },
-        "2025": {
-          "os": 5,
           "od": 6,
           "vs": 5,
           "vd": 5
         }
       }
     },
-    "Kuba": {
-      "player_id": null,
-      "teams_history": "A, C",
+    "Roušar Petr": {
+      "nickname": "Péťa",
+      "player_id": "24335",
+      "teams": "A, B, C",
+      "_order": 4,
       "_legacy": {
-        "os": 15,
-        "od": 20,
-        "vs": 6,
-        "vd": 12,
-        "seasons": 6
+        "os": 96,
+        "od": 91,
+        "vs": 87,
+        "vd": 66,
+        "seasons": 18
       },
       "seasons": {
-        "2024": {
+        "2026": {
           "os": 6,
-          "od": 8,
-          "vs": 6,
+          "od": 6,
+          "vs": 5,
           "vd": 6
-        },
-        "2025": {
-          "os": 8,
-          "od": 9,
-          "vs": 8,
-          "vd": 7
         }
       }
     },
-    "Marlon": {
-      "player_id": "1053104",
-      "teams_history": "A",
+    "Volf Jakub": {
+      "nickname": "Kuba",
+      "player_id": "1012899",
+      "teams": "A, B, C",
+      "_order": 5,
       "_legacy": {
-        "os": 1,
-        "od": 1,
-        "vs": 1,
-        "vd": 0,
-        "seasons": 1
-      },
-      "seasons": {
-        "2025": {
-          "os": 1,
-          "od": 1,
-          "vs": 0,
-          "vd": 0
-        }
-      }
-    },
-    "Kája": {
-      "player_id": "1020939",
-      "teams_history": "A",
-      "_legacy": {
-        "os": 38,
-        "od": 38,
-        "vs": 37,
-        "vd": 16,
+        "os": 29,
+        "od": 37,
+        "vs": 20,
+        "vd": 25,
         "seasons": 8
       },
       "seasons": {
-        "2024": {
-          "os": 7,
-          "od": 7,
-          "vs": 6,
-          "vd": 4
-        },
-        "2025": {
-          "os": 7,
-          "od": 7,
-          "vs": 4,
+        "2026": {
+          "os": 6,
+          "od": 6,
+          "vs": 5,
           "vd": 6
         }
       }
     },
-    "Verča": {
-      "player_id": "1006471",
-      "teams_history": "A",
+    "Göring Marlon": {
+      "nickname": "Marlon",
+      "player_id": "1053104",
+      "teams": "A",
+      "_order": 6,
       "_legacy": {
-        "os": 7,
+        "os": 2,
+        "od": 2,
+        "vs": 1,
+        "vd": 0,
+        "seasons": 2
+      },
+      "seasons": {}
+    },
+    "Nováčková Karolína": {
+      "nickname": "Kája",
+      "player_id": "1020939",
+      "teams": "A, B",
+      "_order": 7,
+      "_legacy": {
+        "os": 52,
+        "od": 52,
+        "vs": 47,
+        "vd": 26,
+        "seasons": 10
+      },
+      "seasons": {
+        "2026": {
+          "os": 6,
+          "od": 6,
+          "vs": 5,
+          "vd": 5
+        }
+      }
+    },
+    "Uhlířová Veronika": {
+      "nickname": "Verča",
+      "player_id": "1006471",
+      "teams": "A",
+      "_order": 8,
+      "_legacy": {
+        "os": 17,
+        "od": 13,
+        "vs": 10,
+        "vd": 10,
+        "seasons": 3
+      },
+      "seasons": {}
+    },
+    "Benetková Jessica": {
+      "nickname": "Jessica",
+      "player_id": "1045010",
+      "teams": "A, B",
+      "_order": 9,
+      "_legacy": {
+        "os": 6,
         "od": 6,
-        "vs": 4,
+        "vs": 2,
         "vd": 5,
         "seasons": 1
       },
       "seasons": {
-        "2024": {
-          "os": 7,
-          "od": 6,
-          "vs": 4,
-          "vd": 4
-        },
-        "2025": {
-          "os": 3,
-          "od": 1,
-          "vs": 2,
-          "vd": 1
-        }
-      }
-    },
-    "Jessica": {
-      "player_id": "1045010",
-      "teams_history": "A",
-      "_legacy": {
-        "os": 0,
-        "od": 0,
-        "vs": 0,
-        "vd": 0,
-        "seasons": 0
-      },
-      "seasons": {
-        "2025": {
+        "2026": {
           "os": 6,
-          "od": 6,
-          "vs": 2,
-          "vd": 5
+          "od": 5,
+          "vs": 5,
+          "vd": 4
         }
       }
     },
-    "Marťa": {
-      "player_id": null,
-      "teams_history": "C",
+    "Špejzlová Martina": {
+      "nickname": "Marťa",
+      "player_id": "1030434",
+      "teams": "B, C, D",
+      "_order": 10,
       "_legacy": {
-        "os": 12,
-        "od": 18,
+        "os": 14,
+        "od": 20,
         "vs": 2,
         "vd": 6,
-        "seasons": 7
+        "seasons": 8
       },
       "seasons": {
-        "2024": {
-          "os": 0,
-          "od": 0,
-          "vs": 0,
-          "vd": 0
-        },
-        "2025": {
-          "os": 2,
-          "od": 2,
-          "vs": 0,
-          "vd": 0
-        }
-      }
-    },
-    "Valča": {
-      "player_id": "1050153",
-      "teams_history": "C",
-      "_legacy": {
-        "os": 0,
-        "od": 0,
-        "vs": 0,
-        "vd": 0,
-        "seasons": 0
-      },
-      "seasons": {
-        "2024": {
-          "os": 5,
-          "od": 5,
-          "vs": 3,
-          "vd": 1
-        },
-        "2025": {
-          "os": 2,
-          "od": 3,
-          "vs": 1,
-          "vd": 1
-        }
-      }
-    },
-    "Maks": {
-      "player_id": "1069295",
-      "teams_history": "C",
-      "_legacy": {
-        "os": 0,
-        "od": 0,
-        "vs": 0,
-        "vd": 0,
-        "seasons": 0
-      },
-      "seasons": {
-        "2024": {
-          "os": 2,
-          "od": 2,
-          "vs": 2,
-          "vd": 2
-        },
-        "2025": {
-          "os": 6,
-          "od": 6,
-          "vs": 6,
-          "vd": 6
-        }
-      }
-    },
-    "Honza Bubeník": {
-      "player_id": null,
-      "teams_history": "C",
-      "_legacy": {
-        "os": 30,
-        "od": 30,
-        "vs": 8,
-        "vd": 9,
-        "seasons": 7
-      },
-      "seasons": {
-        "2024": {
-          "os": 2,
-          "od": 2,
-          "vs": 2,
-          "vd": 2
-        },
-        "2025": {
+        "2026": {
           "os": 3,
-          "od": 2,
+          "od": 3,
+          "vs": 0,
+          "vd": 1
+        }
+      }
+    },
+    "Skopcová Valerie": {
+      "nickname": "Valča",
+      "player_id": "1050153",
+      "teams": "B, C, D",
+      "_order": 11,
+      "_legacy": {
+        "os": 7,
+        "od": 8,
+        "vs": 4,
+        "vd": 2,
+        "seasons": 2
+      },
+      "seasons": {
+        "2026": {
+          "os": 3,
+          "od": 3,
+          "vs": 2,
+          "vd": 2
+        }
+      }
+    },
+    "Suvorov Maksym": {
+      "nickname": "Maks",
+      "player_id": "1069295",
+      "teams": "B, C",
+      "_order": 12,
+      "_legacy": {
+        "os": 8,
+        "od": 8,
+        "vs": 8,
+        "vd": 8,
+        "seasons": 2
+      },
+      "seasons": {
+        "2026": {
+          "os": 4,
+          "od": 3,
+          "vs": 4,
+          "vd": 2
+        }
+      }
+    },
+    "Bubeník Jan": {
+      "nickname": "Honza Buben",
+      "player_id": "1009689",
+      "teams": "C",
+      "_order": 13,
+      "_legacy": {
+        "os": 35,
+        "od": 34,
+        "vs": 13,
+        "vd": 13,
+        "seasons": 9
+      },
+      "seasons": {
+        "2026": {
+          "os": 4,
+          "od": 4,
           "vs": 3,
           "vd": 2
         }
       }
     },
-    "Šimon": {
-      "player_id": null,
-      "teams_history": "C",
+    "Vydlák Šimon": {
+      "nickname": "Šimon",
+      "player_id": "1020936",
+      "teams": "A, C, D",
+      "_order": 14,
       "_legacy": {
-        "os": 11,
-        "od": 10,
-        "vs": 1,
-        "vd": 1,
+        "os": 15,
+        "od": 14,
+        "vs": 3,
+        "vd": 5,
+        "seasons": 7
+      },
+      "seasons": {
+        "2026": {
+          "os": 4,
+          "od": 4,
+          "vs": 3,
+          "vd": 3
+        }
+      }
+    },
+    "Königsmark Jan": {
+      "nickname": "Honza K.",
+      "player_id": "1034935",
+      "teams": "C",
+      "_order": 15,
+      "_legacy": {
+        "os": 9,
+        "od": 8,
+        "vs": 3,
+        "vd": 4,
         "seasons": 5
       },
       "seasons": {
-        "2024": {
+        "2026": {
+          "os": 2,
+          "od": 2,
+          "vs": 0,
+          "vd": 0
+        }
+      }
+    },
+    "Schwarz Ondřej": {
+      "nickname": "Ondra",
+      "player_id": "1050159",
+      "teams": "C, D",
+      "_order": 16,
+      "_legacy": {
+        "os": 1,
+        "od": 1,
+        "vs": 1,
+        "vd": 1,
+        "seasons": 1
+      },
+      "seasons": {
+        "2026": {
+          "os": 2,
+          "od": 1,
+          "vs": 2,
+          "vd": 1
+        }
+      }
+    },
+    "Kotlasová Klára": {
+      "nickname": "Klárka",
+      "player_id": "1057774",
+      "teams": "B, C, D",
+      "_order": 17,
+      "_legacy": {
+        "os": 8,
+        "od": 8,
+        "vs": 3,
+        "vd": 2,
+        "seasons": 2
+      },
+      "seasons": {
+        "2026": {
           "os": 3,
           "od": 3,
-          "vs": 1,
-          "vd": 3
-        },
-        "2025": {
-          "os": 1,
-          "od": 1,
           "vs": 1,
           "vd": 1
         }
       }
     },
-    "Honza Königsmark": {
+    "Hádková Anna": {
+      "nickname": "Anička",
+      "player_id": "1056228",
+      "teams": "A, B, C",
+      "_order": 18,
+      "_legacy": {
+        "os": 2,
+        "od": 3,
+        "vs": 1,
+        "vd": 0,
+        "seasons": 2
+      },
+      "seasons": {
+        "2026": {
+          "os": 3,
+          "od": 2,
+          "vs": 0,
+          "vd": 1
+        }
+      }
+    },
+    "Laňarová Kateřina": {
+      "nickname": "Kačka",
+      "player_id": "1002332",
+      "teams": "B, C",
+      "_order": 19,
+      "_legacy": {
+        "os": 4,
+        "od": 4,
+        "vs": 2,
+        "vd": 1,
+        "seasons": 1
+      },
+      "seasons": {
+        "2026": {
+          "os": 5,
+          "od": 4,
+          "vs": 2,
+          "vd": 2
+        }
+      }
+    },
+    "Jech Martin": {
+      "nickname": "Martin Jech",
+      "player_id": "1009403",
+      "teams": "B, C",
+      "_order": 20,
+      "_legacy": {
+        "os": 6,
+        "od": 6,
+        "vs": 3,
+        "vd": 3,
+        "seasons": 2
+      },
+      "seasons": {
+        "2026": {
+          "os": 4,
+          "od": 4,
+          "vs": 3,
+          "vd": 1
+        }
+      }
+    },
+    "Doležel Jiří": {
+      "nickname": "Jirka",
+      "player_id": "1004122",
+      "teams": "B, C",
+      "_order": 21,
+      "_legacy": {
+        "os": 5,
+        "od": 6,
+        "vs": 2,
+        "vd": 4,
+        "seasons": 2
+      },
+      "seasons": {
+        "2026": {
+          "os": 4,
+          "od": 4,
+          "vs": 2,
+          "vd": 2
+        }
+      }
+    },
+    "Hýbl Jan st.": {
+      "nickname": "Honza Hýbl st.",
       "player_id": null,
-      "teams_history": "C",
+      "teams": "B",
+      "_order": 22,
+      "_legacy": {
+        "os": 6,
+        "od": 7,
+        "vs": 5,
+        "vd": 5,
+        "seasons": 2
+      },
+      "seasons": {}
+    },
+    "Čambor Radovan": {
+      "nickname": "Radovan",
+      "player_id": "1025253",
+      "teams": "B, C, D",
+      "_order": 23,
+      "_legacy": {
+        "os": 6,
+        "od": 3,
+        "vs": 3,
+        "vd": 2,
+        "seasons": 2
+      },
+      "seasons": {
+        "2026": {
+          "os": 3,
+          "od": 3,
+          "vs": 2,
+          "vd": 2
+        }
+      }
+    },
+    "Hýbl Jan ml.": {
+      "nickname": "Honza Hýbl ml.",
+      "player_id": null,
+      "teams": "B",
+      "_order": 24,
+      "_legacy": {
+        "os": 3,
+        "od": 1,
+        "vs": 1,
+        "vd": 1,
+        "seasons": 2
+      },
+      "seasons": {}
+    },
+    "Pikula Tomáš": {
+      "nickname": "Tomáš Pikula",
+      "player_id": null,
+      "teams": "B",
+      "_order": 25,
+      "_legacy": {
+        "os": 5,
+        "od": 5,
+        "vs": 4,
+        "vd": 4,
+        "seasons": 2
+      },
+      "seasons": {}
+    },
+    "Mlejnek Roman": {
+      "nickname": "Boris",
+      "player_id": "1016027",
+      "teams": "B, C, D",
+      "_order": 26,
+      "_legacy": {
+        "os": 5,
+        "od": 4,
+        "vs": 1,
+        "vd": 0,
+        "seasons": 2
+      },
+      "seasons": {
+        "2026": {
+          "os": 4,
+          "od": 4,
+          "vs": 2,
+          "vd": 3
+        }
+      }
+    },
+    "Bělov Petr": {
+      "nickname": "Péťa Bělov",
+      "player_id": "1044132",
+      "teams": "B, D",
+      "_order": 27,
+      "_legacy": {
+        "os": 4,
+        "od": 5,
+        "vs": 1,
+        "vd": 2,
+        "seasons": 2
+      },
+      "seasons": {
+        "2026": {
+          "os": 3,
+          "od": 3,
+          "vs": 1,
+          "vd": 1
+        }
+      }
+    },
+    "Přibyl Tadeáš": {
+      "nickname": "Tadeáš",
+      "player_id": "1037711",
+      "teams": "B, D",
+      "_order": 28,
+      "_legacy": {
+        "os": 2,
+        "od": 4,
+        "vs": 1,
+        "vd": 2,
+        "seasons": 2
+      },
+      "seasons": {
+        "2026": {
+          "os": 5,
+          "od": 5,
+          "vs": 3,
+          "vd": 3
+        }
+      }
+    },
+    "Tichý Ján": {
+      "nickname": "Honza Tichý",
+      "player_id": "1049342",
+      "teams": "B, D",
+      "_order": 29,
+      "_legacy": {
+        "os": 1,
+        "od": 1,
+        "vs": 0,
+        "vd": 1,
+        "seasons": 2
+      },
+      "seasons": {
+        "2026": {
+          "os": 1,
+          "od": 1,
+          "vs": 1,
+          "vd": 0
+        }
+      }
+    },
+    "Klusáková Lucka": {
+      "nickname": "Lucka",
+      "player_id": null,
+      "teams": "B",
+      "_order": 30,
+      "_legacy": {
+        "os": 9,
+        "od": 10,
+        "vs": 3,
+        "vd": 3,
+        "seasons": 2
+      },
+      "seasons": {}
+    },
+    "Bušková Michaela": {
+      "nickname": "Míša Bušková",
+      "player_id": "1018710",
+      "teams": "B, C",
+      "_order": 31,
+      "_legacy": {
+        "os": 8,
+        "od": 8,
+        "vs": 3,
+        "vd": 3,
+        "seasons": 2
+      },
+      "seasons": {
+        "2026": {
+          "os": 1,
+          "od": 2,
+          "vs": 0,
+          "vd": 2
+        }
+      }
+    },
+    "Boutineau Lenka": {
+      "nickname": "Lenka Bout.",
+      "player_id": "14760",
+      "teams": "C, D",
+      "_order": 32,
       "_legacy": {
         "os": 5,
         "od": 4,
         "vs": 0,
-        "vd": 0,
-        "seasons": 3
-      },
-      "seasons": {
-        "2024": {
-          "os": 2,
-          "od": 2,
-          "vs": 1,
-          "vd": 2
-        },
-        "2025": {
-          "os": 2,
-          "od": 2,
-          "vs": 2,
-          "vd": 2
-        }
-      }
-    },
-    "Ondra": {
-      "player_id": null,
-      "teams_history": "C",
-      "_legacy": {
-        "os": 0,
-        "od": 0,
-        "vs": 0,
-        "vd": 0,
-        "seasons": 0
-      },
-      "seasons": {
-        "2024": {
-          "os": 1,
-          "od": 1,
-          "vs": 1,
-          "vd": 1
-        },
-        "2025": {
-          "os": 0,
-          "od": 0,
-          "vs": 0,
-          "vd": 0
-        }
-      }
-    },
-    "Radim": {
-      "player_id": "1015429",
-      "teams_history": "C",
-      "_legacy": {
-        "os": 0,
-        "od": 0,
-        "vs": 0,
-        "vd": 0,
+        "vd": 1,
         "seasons": 1
       },
       "seasons": {
-        "2024": {
-          "os": 2,
-          "od": 2,
-          "vs": 1,
-          "vd": 0
-        },
-        "2025": {
-          "os": 0,
-          "od": 0,
-          "vs": 0,
-          "vd": 0
-        }
-      }
-    },
-    "Kuba Šimek": {
-      "player_id": null,
-      "teams_history": "C",
-      "_legacy": {
-        "os": 0,
-        "od": 0,
-        "vs": 0,
-        "vd": 0,
-        "seasons": 0
-      },
-      "seasons": {
-        "2024": {
-          "os": 0,
-          "od": 1,
-          "vs": 0,
-          "vd": 0
-        },
-        "2025": {
-          "os": 0,
-          "od": 0,
-          "vs": 0,
-          "vd": 0
-        }
-      }
-    },
-    "Klárka": {
-      "player_id": null,
-      "teams_history": "C",
-      "_legacy": {
-        "os": 0,
-        "od": 0,
-        "vs": 0,
-        "vd": 0,
-        "seasons": 0
-      },
-      "seasons": {
-        "2024": {
-          "os": 5,
-          "od": 5,
-          "vs": 3,
-          "vd": 2
-        },
-        "2025": {
-          "os": 3,
-          "od": 3,
-          "vs": 0,
-          "vd": 0
-        }
-      }
-    },
-    "Anička": {
-      "player_id": null,
-      "teams_history": "C",
-      "_legacy": {
-        "os": 0,
-        "od": 0,
-        "vs": 0,
-        "vd": 0,
-        "seasons": 0
-      },
-      "seasons": {
-        "2024": {
-          "os": 1,
-          "od": 1,
-          "vs": 0,
-          "vd": 0
-        },
-        "2025": {
-          "os": 1,
-          "od": 2,
-          "vs": 1,
-          "vd": 0
-        }
-      }
-    },
-    "Kačka": {
-      "player_id": null,
-      "teams_history": "C",
-      "_legacy": {
-        "os": 0,
-        "od": 0,
-        "vs": 0,
-        "vd": 0,
-        "seasons": 0
-      },
-      "seasons": {
-        "2025": {
+        "2026": {
           "os": 4,
           "od": 4,
           "vs": 2,
-          "vd": 1
-        }
-      }
-    },
-    "Martin Jech": {
-      "player_id": null,
-      "teams_history": "B",
-      "_legacy": {
-        "os": 0,
-        "od": 0,
-        "vs": 0,
-        "vd": 0,
-        "seasons": 0
-      },
-      "seasons": {
-        "2024": {
-          "os": 1,
-          "od": 1,
-          "vs": 1,
-          "vd": 1
-        },
-        "2025": {
-          "os": 5,
-          "od": 5,
-          "vs": 2,
-          "vd": 2
-        }
-      }
-    },
-    "Jirka Doležel": {
-      "player_id": null,
-      "teams_history": "B",
-      "_legacy": {
-        "os": 0,
-        "od": 0,
-        "vs": 0,
-        "vd": 0,
-        "seasons": 0
-      },
-      "seasons": {
-        "2024": {
-          "os": 2,
-          "od": 2,
-          "vs": 2,
-          "vd": 2
-        },
-        "2025": {
-          "os": 3,
-          "od": 4,
-          "vs": 0,
-          "vd": 2
-        }
-      }
-    },
-    "Honza Hýbl st.": {
-      "player_id": null,
-      "teams_history": "B",
-      "_legacy": {
-        "os": 0,
-        "od": 0,
-        "vs": 0,
-        "vd": 0,
-        "seasons": 0
-      },
-      "seasons": {
-        "2024": {
-          "os": 3,
-          "od": 4,
-          "vs": 3,
-          "vd": 3
-        },
-        "2025": {
-          "os": 3,
-          "od": 3,
-          "vs": 2,
-          "vd": 2
-        }
-      }
-    },
-    "Radovan Čambor": {
-      "player_id": null,
-      "teams_history": "B",
-      "_legacy": {
-        "os": 0,
-        "od": 0,
-        "vs": 0,
-        "vd": 0,
-        "seasons": 0
-      },
-      "seasons": {
-        "2024": {
-          "os": 2,
-          "od": 0,
-          "vs": 2,
-          "vd": 0
-        },
-        "2025": {
-          "os": 4,
-          "od": 3,
-          "vs": 1,
-          "vd": 2
-        }
-      }
-    },
-    "Tomáš Pikula": {
-      "player_id": null,
-      "teams_history": "B",
-      "_legacy": {
-        "os": 0,
-        "od": 0,
-        "vs": 0,
-        "vd": 0,
-        "seasons": 0
-      },
-      "seasons": {
-        "2024": {
-          "os": 1,
-          "od": 1,
-          "vs": 1,
-          "vd": 1
-        },
-        "2025": {
-          "os": 2,
-          "od": 0,
-          "vs": 0,
-          "vd": 0
-        }
-      }
-    },
-    "Honza Hýbl ml.": {
-      "player_id": null,
-      "teams_history": "B",
-      "_legacy": {
-        "os": 0,
-        "od": 0,
-        "vs": 0,
-        "vd": 0,
-        "seasons": 0
-      },
-      "seasons": {
-        "2024": {
-          "os": 3,
-          "od": 2,
-          "vs": 3,
-          "vd": 2
-        },
-        "2025": {
-          "os": 2,
-          "od": 3,
-          "vs": 1,
-          "vd": 2
-        }
-      }
-    },
-    "Boris": {
-      "player_id": null,
-      "teams_history": "B",
-      "_legacy": {
-        "os": 0,
-        "od": 0,
-        "vs": 0,
-        "vd": 0,
-        "seasons": 0
-      },
-      "seasons": {
-        "2024": {
-          "os": 2,
-          "od": 1,
-          "vs": 1,
-          "vd": 0
-        },
-        "2025": {
-          "os": 3,
-          "od": 3,
-          "vs": 0,
-          "vd": 0
-        }
-      }
-    },
-    "Péťa Bělov": {
-      "player_id": null,
-      "teams_history": "B",
-      "_legacy": {
-        "os": 0,
-        "od": 0,
-        "vs": 0,
-        "vd": 0,
-        "seasons": 0
-      },
-      "seasons": {
-        "2024": {
-          "os": 1,
-          "od": 3,
-          "vs": 0,
-          "vd": 2
-        },
-        "2025": {
-          "os": 3,
-          "od": 2,
-          "vs": 1,
-          "vd": 0
-        }
-      }
-    },
-    "Tadeáš Přibyl": {
-      "player_id": null,
-      "teams_history": "B",
-      "_legacy": {
-        "os": 0,
-        "od": 0,
-        "vs": 0,
-        "vd": 0,
-        "seasons": 0
-      },
-      "seasons": {
-        "2024": {
-          "os": 0,
-          "od": 2,
-          "vs": 0,
-          "vd": 2
-        },
-        "2025": {
-          "os": 2,
-          "od": 2,
-          "vs": 1,
-          "vd": 0
-        }
-      }
-    },
-    "Honza Tichý": {
-      "player_id": null,
-      "teams_history": "B",
-      "_legacy": {
-        "os": 0,
-        "od": 0,
-        "vs": 0,
-        "vd": 0,
-        "seasons": 1
-      },
-      "seasons": {
-        "2024": {
-          "os": 1,
-          "od": 1,
-          "vs": 0,
-          "vd": 1
-        },
-        "2025": {
-          "os": 0,
-          "od": 0,
-          "vs": 0,
-          "vd": 0
-        }
-      }
-    },
-    "Lucka Klusáková": {
-      "player_id": null,
-      "teams_history": "B",
-      "_legacy": {
-        "os": 0,
-        "od": 0,
-        "vs": 0,
-        "vd": 0,
-        "seasons": 0
-      },
-      "seasons": {
-        "2024": {
-          "os": 4,
-          "od": 4,
-          "vs": 2,
-          "vd": 2
-        },
-        "2025": {
-          "os": 5,
-          "od": 6,
-          "vs": 1,
-          "vd": 1
-        }
-      }
-    },
-    "Míša Bušková": {
-      "player_id": null,
-      "teams_history": "B",
-      "_legacy": {
-        "os": 0,
-        "od": 0,
-        "vs": 0,
-        "vd": 0,
-        "seasons": 0
-      },
-      "seasons": {
-        "2024": {
-          "os": 4,
-          "od": 4,
-          "vs": 3,
-          "vd": 3
-        },
-        "2025": {
-          "os": 4,
-          "od": 4,
-          "vs": 0,
-          "vd": 0
-        }
-      }
-    },
-    "Lenka Boutineau": {
-      "player_id": null,
-      "teams_history": "",
-      "_legacy": {
-        "os": 0,
-        "od": 0,
-        "vs": 0,
-        "vd": 0,
-        "seasons": 0
-      },
-      "seasons": {
-        "2025": {
-          "os": 5,
-          "od": 4,
-          "vs": 0,
-          "vd": 1
-        }
-      }
-    },
-    "Tomáš Tichý": {
-      "player_id": null,
-      "teams_history": "",
-      "_legacy": {
-        "os": 0,
-        "od": 1,
-        "vs": 0,
-        "vd": 0,
-        "seasons": 1
-      },
-      "seasons": {
-        "2024": {
-          "os": 4,
-          "od": 4,
-          "vs": 4,
           "vd": 3
         }
       }
     },
-    "Lenka Tichá": {
+    "Tichý Tomáš": {
+      "nickname": "Tomáš Tichý",
       "player_id": null,
-      "teams_history": "",
+      "teams": "",
+      "_order": 33,
       "_legacy": {
-        "os": 10,
-        "od": 10,
-        "vs": 2,
-        "vd": 4,
-        "seasons": 1
+        "os": 4,
+        "od": 5,
+        "vs": 4,
+        "vd": 3,
+        "seasons": 2
+      },
+      "seasons": {}
+    },
+    "Tichá Lenka": {
+      "nickname": "Lenka Tichá",
+      "player_id": "21823",
+      "teams": "D",
+      "_order": 34,
+      "_legacy": {
+        "os": 12,
+        "od": 12,
+        "vs": 4,
+        "vd": 5,
+        "seasons": 2
       },
       "seasons": {
-        "2024": {
-          "os": 2,
-          "od": 2,
-          "vs": 2,
-          "vd": 1
+        "2026": {
+          "os": 3,
+          "od": 3,
+          "vs": 3,
+          "vd": 2
         }
       }
     },
     "Tříška Martin": {
-      "player_id": null,
-      "teams_history": "A",
+      "nickname": "Tříška",
+      "player_id": "21800",
+      "teams": "A",
+      "_order": 35,
       "_legacy": {
         "os": 43,
         "od": 42,
@@ -946,7 +748,182 @@
           }
         }
       },
-      "seasons": {}
+      "seasons": {
+        "2026": {
+          "os": 4,
+          "od": 4,
+          "vs": 2,
+          "vd": 3
+        }
+      }
+    },
+    "Wasserbauerová Adéla": {
+      "nickname": "Wasserbauerová Adéla",
+      "player_id": "1011493",
+      "teams": "A, B",
+      "_order": 36,
+      "_legacy": {
+        "os": 0,
+        "od": 0,
+        "vs": 0,
+        "vd": 0,
+        "seasons": 0
+      },
+      "seasons": {
+        "2026": {
+          "os": 3,
+          "od": 3,
+          "vs": 2,
+          "vd": 2
+        }
+      }
+    },
+    "Poulka Maria": {
+      "nickname": "Poulka Maria",
+      "player_id": "1076211",
+      "teams": "A",
+      "_order": 37,
+      "_legacy": {
+        "os": 0,
+        "od": 0,
+        "vs": 0,
+        "vd": 0,
+        "seasons": 0
+      },
+      "seasons": {
+        "2026": {
+          "os": 1,
+          "od": 1,
+          "vs": 0,
+          "vd": 0
+        }
+      }
+    },
+    "Vančuřík Štěpán": {
+      "nickname": "Vančuřík Štěpán",
+      "player_id": "38670",
+      "teams": "A, B",
+      "_order": 38,
+      "_legacy": {
+        "os": 0,
+        "od": 0,
+        "vs": 0,
+        "vd": 0,
+        "seasons": 0
+      },
+      "seasons": {
+        "2026": {
+          "os": 3,
+          "od": 3,
+          "vs": 1,
+          "vd": 1
+        }
+      }
+    },
+    "Olšák Petr": {
+      "nickname": "Olšák Petr",
+      "player_id": "32238",
+      "teams": "B",
+      "_order": 39,
+      "_legacy": {
+        "os": 0,
+        "od": 0,
+        "vs": 0,
+        "vd": 0,
+        "seasons": 0
+      },
+      "seasons": {
+        "2026": {
+          "os": 2,
+          "od": 3,
+          "vs": 2,
+          "vd": 3
+        }
+      }
+    },
+    "Hýbl Jan": {
+      "nickname": "Hýbl Jan",
+      "player_id": "4642",
+      "teams": "C, D",
+      "_order": 40,
+      "_legacy": {
+        "os": 0,
+        "od": 0,
+        "vs": 0,
+        "vd": 0,
+        "seasons": 0
+      },
+      "seasons": {
+        "2026": {
+          "os": 3,
+          "od": 4,
+          "vs": 3,
+          "vd": 3
+        }
+      }
+    },
+    "Klusáková Lucie": {
+      "nickname": "Klusáková Lucie",
+      "player_id": "35487",
+      "teams": "C",
+      "_order": 41,
+      "_legacy": {
+        "os": 0,
+        "od": 0,
+        "vs": 0,
+        "vd": 0,
+        "seasons": 0
+      },
+      "seasons": {
+        "2026": {
+          "os": 5,
+          "od": 5,
+          "vs": 2,
+          "vd": 3
+        }
+      }
+    },
+    "Nováček Kryštof": {
+      "nickname": "Nováček Kryštof",
+      "player_id": "1043679",
+      "teams": "D",
+      "_order": 42,
+      "_legacy": {
+        "os": 0,
+        "od": 0,
+        "vs": 0,
+        "vd": 0,
+        "seasons": 0
+      },
+      "seasons": {
+        "2026": {
+          "os": 1,
+          "od": 1,
+          "vs": 0,
+          "vd": 0
+        }
+      }
+    },
+    "Schmidt Eric": {
+      "nickname": "Schmidt Eric",
+      "player_id": "1050454",
+      "teams": "D",
+      "_order": 43,
+      "_legacy": {
+        "os": 0,
+        "od": 0,
+        "vs": 0,
+        "vd": 0,
+        "seasons": 0
+      },
+      "seasons": {
+        "2026": {
+          "os": 0,
+          "od": 2,
+          "vs": 0,
+          "vd": 1
+        }
+      }
     }
   }
 }
