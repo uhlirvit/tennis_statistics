@@ -188,7 +188,10 @@ def parse_match_record(html: str, club_name: str) -> dict:
         body_d = tds[12].get_text(strip=True)
         body_h = tds[13].get_text(strip=True)
 
-        match_type = "debl" if len(home_players) == 2 else "singl"
+        # Use the maximum player count across both sides to determine type.
+        # A forfeit doubles row has 0 home players but 2 guest players --
+        # checking only the home side would misclassify it as singl.
+        match_type = "debl" if max(len(home_players), len(away_players)) == 2 else "singl"
 
         if our_side == "D":
             our_players, opp_players = home_players, away_players
