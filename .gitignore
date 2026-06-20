@@ -1,7 +1,9 @@
 GITIGNORE
 # Generated output -- regenerate anytime by running main.py
-output/*.xlsx
-output/*.csv
+output/
+**/*.png
+**/*.pptx
+**/*.txt
 
 # Not created yet, but coming soon per the roadmap -- exclude now so
 # nothing ever lands in git history by accident.
