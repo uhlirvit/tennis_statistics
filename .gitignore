@@ -1,6 +1,6 @@
 GITIGNORE
 # Generated output -- regenerate anytime by running main.py
-output/
+output/charts
 **/*.png
 **/*.pptx
 **/*.txt
