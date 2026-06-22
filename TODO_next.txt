@@ -15,8 +15,9 @@ ONGOING:
 
 TODO:
 10) Add overall standings of the teams (potentionally going up/down)
-
+11) Improve it to be more robust and automatically put people with same stats at the same spot (equal)
 
 
 Prompts:
+(Claude/designer):
 
