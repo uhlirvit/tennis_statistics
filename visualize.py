@@ -15,6 +15,7 @@ Charts produced:
   1_vazeno.png     — Body Váženo horizontal bar chart
   2_cumulative.png — Cumulative Body Váženo round-by-round
   3_performance.png — Odehráno celkem vs Body Váženo (commitment vs performance)
+  4_specialist.png — Singl vs Debl win-rate butterfly chart
 
 Requires: pip install matplotlib openpyxl
 """
@@ -324,6 +325,93 @@ def chart_cumulative(log, title, color=C_BLUE, meta=""):
     return fig
 
 
+# ── Chart 3: Commitment vs Performance scatter ─────────────────────────────
+
+def chart_performance(summary, title, color=C_BLUE, meta="", scope_label=""):
+    """
+    X: Odehráno celkem (commitment / availability)
+    Y: Body Váženo (performance / contribution)
+    Median reference lines divide the chart into four natural quadrants.
+    NOTE: path_effects are intentionally NOT used here — they caused a
+    segfault in some matplotlib builds on Linux.
+    """
+    active = [s for s in summary if s.get("celkem", 0) > 0]
+    if not active:
+        return None
+
+    xs     = [s["celkem"]  for s in active]
+    ys     = [s["vazeno"]  for s in active]
+    names  = [s["name"]    for s in active]
+    teams  = [str(s.get("teams", scope_label) or scope_label) for s in active]
+
+    unique_teams = sorted(set(teams))
+    if len(unique_teams) == 1:
+        dot_colors = [color] * len(active)
+    else:
+        dot_colors = [_team_color(t.split(",")[0].strip()) if t else C_STEELBL
+                      for t in teams]
+
+    fig, ax = plt.subplots(figsize=(9, 7.5), facecolor=BG)
+    ax.set_facecolor(BG)
+
+    ax.scatter(xs, ys, c=dot_colors, s=100, alpha=0.85, zorder=4,
+               edgecolors="white", linewidths=0.8)
+
+    # Safe range — guard against all-identical values (e.g. test data)
+    x_range = max(max(xs) - min(xs), 1)
+    y_range = max(max(ys) - min(ys), 0.5)
+    med_x   = sorted(xs)[len(xs) // 2]
+    med_y   = sorted(ys)[len(ys) // 2]
+
+    ax.axvline(med_x, color="#CCCCCC", lw=1.0, ls="--", zorder=1)
+    ax.axhline(med_y, color="#CCCCCC", lw=1.0, ls="--", zorder=1)
+
+    # Quadrant corner labels
+    pad_x, pad_y = x_range * 0.04, y_range * 0.04
+    for qx, qy, ql, ha, va in [
+        (max(xs) - pad_x, max(ys) - pad_y, "Páteř týmu",   "right", "top"),
+        (min(xs) + pad_x, max(ys) - pad_y, "Specialisté",  "left",  "top"),
+        (min(xs) + pad_x, min(ys) + pad_y, "Rezervy",      "left",  "bottom"),
+        (max(xs) - pad_x, min(ys) + pad_y, "Dřevorubci",   "right", "bottom"),
+    ]:
+        ax.text(qx, qy, ql, ha=ha, va=va, fontsize=8,
+                color="#CCCCCC", fontstyle="italic", zorder=1)
+
+    # Player name labels — simple bbox instead of path_effects
+    for x, y, name, c in zip(xs, ys, names, dot_colors):
+        parts = name.split()
+        short = f"{parts[-1]} {parts[0][0]}." if len(parts) > 1 else name
+        ax.annotate(
+            short, (x, y), xytext=(4, 4), textcoords="offset points",
+            fontsize=8, color="#333333",
+            bbox=dict(boxstyle="round,pad=0.1", fc="white", ec="none", alpha=0.55),
+        )
+
+    # Team colour legend (multi-team only)
+    if len(unique_teams) > 1:
+        from matplotlib.lines import Line2D
+        handles = [Line2D([0], [0], marker="o", color="w",
+                          markerfacecolor=_team_color(t.split(",")[0].strip()),
+                          markersize=9, label=f"Tým {t}")
+                   for t in unique_teams]
+        ax.legend(handles=handles, loc="lower right", framealpha=0.85, fontsize=9)
+
+    ax.set_xlabel("Odehráno celkem (zápasů)", labelpad=8, color="#555555")
+    ax.set_ylabel("Body Váženo",               labelpad=8, color="#555555")
+    ax.set_title(title, fontsize=13, fontweight="bold", pad=14, color="#222222")
+    if meta:
+        ax.text(0.99, 0.01, meta, transform=ax.transAxes,
+                ha="right", va="bottom", fontsize=8, color="#BBBBBB")
+
+    ax.set_xlim(min(xs) - x_range * 0.12, max(xs) + x_range * 0.18)
+    ax.set_ylim(min(ys) - y_range * 0.15, max(ys) + y_range * 0.12)
+    ax.tick_params(colors="#888888")
+    ax.grid(axis="both", color=GRID, linewidth=0.8, zorder=0)
+    ax.set_axisbelow(True)
+    fig.tight_layout(pad=1.2)
+    return fig
+
+
 # ── Chart 4: Singl vs Debl specialist butterfly ────────────────────────────
 
 def chart_specialist(summary, title, meta=""):
@@ -501,6 +589,8 @@ def process_workbook(xlsx_path: str, charts_base: str):
                      else (f'Tým {label} — {season} / {category}' if label
                            else f'{season} / {category}'))
 
+        scope_label = label if label not in ("All Club", "") else ""
+
         display = label or '(bez označení)'
         print(f'  [{display}]', end='')
 
@@ -514,10 +604,24 @@ def process_workbook(xlsx_path: str, charts_base: str):
         if fig:
             _save(fig, os.path.join(out_dir, f'{scope}_2_cumulative.png'))
 
-        # 3 — Specialist butterfly
-        fig = chart_specialist(summary, f'Singlista vs Deblista  ·  {title_pfx}', meta)
+        # 3 — Commitment vs performance scatter
+        fig = chart_performance(summary, f'Zápasy vs Body Váženo  ·  {title_pfx}',
+                                color, meta, scope_label)
         if fig:
-            _save(fig, os.path.join(out_dir, f'{scope}_3_specialist.png'))
+            _save(fig, os.path.join(out_dir, f'{scope}_3_performance.png'))
+
+        # 4 — Specialist butterfly
+        # For the all-club view the win rates are COMBINED across every team
+        # a player plays for — so Péťa's singl % here is his total singl
+        # record across Tým A + Tým C together, not per-team.  Per-team
+        # charts (_tym_A_4_specialist.png etc.) show per-team rates and
+        # will match the per-team Ocenění sheets exactly.
+        specialist_title = f'Singlista vs Deblista  ·  {title_pfx}'
+        if label == 'All Club':
+            specialist_title += '\n(hodnoty kombinovány přes všechny týmy)'
+        fig = chart_specialist(summary, specialist_title, meta)
+        if fig:
+            _save(fig, os.path.join(out_dir, f'{scope}_4_specialist.png'))
 
 
 

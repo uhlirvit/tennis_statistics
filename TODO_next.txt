@@ -7,16 +7,16 @@ DONE:
 6) Adding club summary and ranking
 7) Adding club history
 8) Adding plots
-10) Adding different categories (dorost, st. žáci, ml. žáci, baby, ...)
+9) Adding different categories (dorost, st. žáci, ml. žáci, baby, ...)
 
 ONGOING:
-9) Adding nicknames in output layer
+
 
 
 TODO:
-
+10) Add overall standings of the teams (potentionally going up/down)
 
 
 
 Prompts:
-- Wouldn't it be also possible to create interactive html for all the teams within the 1 season (e.g. 2026), where there would be only the Pořadí category ("Awards" in the sheets) with metrics same as the sheets but instead of choosing between categories (Pořadí, Kariéra, ...) we would be choosing between teams? I started to really like the interactive html. And I am thinking actually providing it to all the members who would like to take a look.
+
